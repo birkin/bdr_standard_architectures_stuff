@@ -102,7 +102,10 @@ Support command-line options:
 --output-json common_architectures.json
 --output-md common_architectures.md
 --cache-dir .architecture_cache
+--state-file .architecture_cache/run_state.json
 --refresh-cache
+--refresh-state
+--no-resume
 --include-private false
 --full-item-validation-sample 0
 --collection-query-mode public-top-level
@@ -116,6 +119,7 @@ Defaults:
 - `rows`: `100`, safely below the Search API cap of `500`
 - `sleep-seconds`: at least `0.25`, because the public wiki warns about Cloudflare Bot Protection for high-rate API traffic
 - cache enabled by default
+- state/resume file enabled by default
 - full item validation disabled by default
 
 Useful optional tuning:
@@ -548,7 +552,7 @@ Suggested internal functions/classes:
 @dataclass
 class ApiClient:
     api_root: str
-    session: requests.Session
+    session: httpx.Client
     sleep_seconds: float
     cache: Cache
 
@@ -597,7 +601,7 @@ def render_markdown_report(result: dict) -> str:
 
 ### Search helper
 
-Use `requests.Session`.
+Use `httpx.Client`, per this repository's coding directives.
 
 Set an explicit user agent:
 
@@ -608,7 +612,7 @@ BDRArchitectureSampler/0.1 (Brown University Library internal planning)
 Use timeouts:
 
 ```python
-timeout = (5, 60)
+timeout = httpx.Timeout(60.0, connect=5.0)
 ```
 
 Retry only conservatively:
@@ -621,7 +625,7 @@ Retry only conservatively:
 
 ### Query encoding
 
-Build params with `requests`, not hand-concatenated strings:
+Build params with `httpx`, not hand-concatenated strings:
 
 ```python
 params = {
@@ -630,7 +634,7 @@ params = {
     "rows": 100,
     "start": 0,
 }
-session.get(f"{api_root}search/", params=params)
+client.get(f"{api_root}search/", params=params)
 ```
 
 ### Pagination
@@ -670,6 +674,83 @@ Reason:
 - The analysis may involve thousands of repeated public API calls during development.
 - Caching reduces Cloudflare/API pressure and makes debugging deterministic.
 
+## Resumable Run State
+
+In addition to the response cache, persist a run-state file so a network failure, process interruption, or Cloudflare-related stop can resume without losing completed analysis.
+
+Default path:
+
+```text
+.architecture_cache/run_state.json
+```
+
+The state file should be written atomically after each meaningful unit of work:
+
+- after collection discovery/counting
+- after selecting collections
+- after each checked collection
+- after each checked parent item, if parent-level processing is long-running
+- after architecture candidate buckets change
+
+Use a temp file plus rename, for example `run_state.json.tmp` then `run_state.json`, so an interrupted write does not corrupt the previous state.
+
+State should include at least:
+
+```json
+{
+  "script_version": "0.1",
+  "api_root": "https://repository.library.brown.edu/api/",
+  "parameters": {},
+  "started_at": "2026-05-22T...",
+  "updated_at": "2026-05-22T...",
+  "collections_discovered": [],
+  "selected_collections": [],
+  "checked": {
+    "collection_counts": ["bdr:..."],
+    "collections": ["bdr:..."],
+    "parent_items": ["bdr:..."]
+  },
+  "parent_item_signature_hashes": {
+    "bdr:...": "abc123..."
+  },
+  "in_progress": {
+    "collection_pid": "bdr:...",
+    "parent_pid": "bdr:..."
+  },
+  "common_architecture_candidates": {
+    "abc123...": {
+      "signature_hash": "abc123...",
+      "signature": {},
+      "total_sampled_items": 12,
+      "dominant_in_collections": 1,
+      "appears_in_collections": 2,
+      "example_collections": [],
+      "example_items": []
+    }
+  },
+  "collection_summaries": [],
+  "warnings": []
+}
+```
+
+Resume behavior:
+
+- Load `--state-file` at startup unless `--refresh-state` is passed.
+- Validate that `script_version`, `api_root`, and material parameters match the current run.
+- If they do not match, stop with a clear message unless `--refresh-state` is passed.
+- Skip already checked collection counts, collections, and parent items.
+- Rehydrate `common_architecture_candidates`, `collection_summaries`, and checked sets from state before continuing.
+- Treat cache files as reusable HTTP responses and the state file as resumable analysis progress; do not rely on cache files alone to infer what has been checked.
+
+Useful related options:
+
+```text
+--refresh-state
+--no-resume
+```
+
+`--refresh-cache` should not automatically discard run state. Keep cache refresh and state refresh separate so a user can re-fetch API responses while preserving or explicitly resetting analysis progress.
+
 ## Rate Limiting And Operational Safety
 
 Important because the public BDR API wiki warns about Cloudflare Bot Protection for high-volume API usage.
@@ -687,7 +768,7 @@ For production/internal use:
 
 - consider running against an internal API endpoint or direct Solr read-only endpoint
 - coordinate with BDR maintainers before full-repository scans
-- write a resume file so long scans can continue without repeating requests
+- keep the state/resume file enabled so long scans can continue without repeating checked work
 
 ## Edge Cases
 
@@ -829,7 +910,7 @@ Test:
 With network/API access:
 
 ```bash
-python determine_common_bdr_architectures.py \
+uv run ./determine_common_bdr_architectures.py \
   --max-collections 1 \
   --max-items-per-collection 5 \
   --rows 5 \
@@ -873,6 +954,7 @@ Build a read-only prototype that:
    - child count buckets
 7. Produces JSON and Markdown reports.
 8. Uses cache and rate limiting by default.
+9. Saves resumable state, including checked work and populated common-architecture candidates.
 
 After reviewing prototype output, decide whether to add:
 
@@ -888,30 +970,46 @@ After reviewing prototype output, decide whether to add:
 def main():
     args = parse_args()
     client = ApiClient(args)
+    state = load_or_initialize_state(args)
 
     collections = discover_collections(client, args)
     for collection in collections:
+        if state.has_checked_collection_count(collection.pid):
+            continue
         collection.top_level_item_count = count_top_level_items(client, collection.pid)
+        state.mark_collection_count_checked(collection)
+        save_state(args.state_file, state)
 
     selected = sorted(collections, key=lambda c: c.top_level_item_count, reverse=True)
     selected = selected[:args.max_collections]
+    state.set_selected_collections(selected)
+    save_state(args.state_file, state)
 
-    architecture_index = ArchitectureIndex()
-    collection_summaries = []
+    architecture_index = ArchitectureIndex.from_state(state)
+    collection_summaries = state.collection_summaries
 
     for collection in selected:
+        if state.has_checked_collection(collection.pid):
+            continue
         parent_docs = fetch_sampled_top_level_items(client, collection.pid, args)
         item_signature_hashes = []
 
         for parent_doc in parent_docs:
+            if state.has_checked_parent_item(parent_doc["pid"]):
+                item_signature_hashes.append(state.get_parent_signature_hash(parent_doc["pid"]))
+                continue
             child_docs = fetch_children(client, parent_doc["pid"], args)
             signature = build_item_signature(parent_doc, child_docs, args)
             signature_hash = hash_signature(signature)
             architecture_index.add(signature_hash, signature, collection, parent_doc)
             item_signature_hashes.append(signature_hash)
+            state.mark_parent_item_checked(parent_doc, signature_hash, architecture_index)
+            save_state(args.state_file, state)
 
         summary = classify_collection(collection, item_signature_hashes, args)
         collection_summaries.append(summary)
+        state.mark_collection_checked(collection, summary, architecture_index)
+        save_state(args.state_file, state)
 
     result = build_result(args, collection_summaries, architecture_index)
     write_json(args.output_json, result)
