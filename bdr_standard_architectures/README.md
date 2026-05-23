@@ -26,7 +26,19 @@ I'm thinking it might be possible to use the BDR-APIs to:
 ## Usage
 
 ```bash
-uv run ./main.py
+uv run ./main.py --help
+```
+
+Small public-API smoke run:
+
+```bash
+uv run ./main.py \
+  --max-collections 1 \
+  --max-items-per-collection 5 \
+  --rows 5 \
+  --sleep-seconds 1 \
+  --output-json /tmp/bdr_architectures.json \
+  --output-md /tmp/bdr_architectures.md
 ```
 
 ---
