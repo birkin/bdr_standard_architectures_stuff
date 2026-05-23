@@ -1,9 +1,12 @@
 import argparse
 import hashlib
 import json
+import logging
 from typing import Any
 
 from lib.utils import first_value
+
+log = logging.getLogger(__name__)
 
 
 def build_item_signature(
@@ -108,6 +111,7 @@ def hash_signature(signature: dict[str, Any]) -> str:
     Called by: lib.sampler.run_sampler_with_client()
     """
     signature_key = json.dumps(signature, sort_keys=True, separators=(',', ':'))
+    log.debug(f'signature_key, ``{signature_key}``')
     signature_hash = hashlib.sha256(signature_key.encode('utf-8')).hexdigest()[:12]
     return signature_hash
 
