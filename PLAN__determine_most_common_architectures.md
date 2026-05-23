@@ -1,5 +1,32 @@
 # Plan: determine common BDR object architectures
 
+## Table Of Contents
+
+- [Purpose](#purpose)
+- [Reviewed Context](#reviewed-context)
+- [Recommendation](#recommendation)
+- [Proposed Script Name](#proposed-script-name)
+- [Inputs And Configuration](#inputs-and-configuration)
+- [Data Retrieval Strategy](#data-retrieval-strategy)
+- [Architecture Signature Design](#architecture-signature-design)
+- [Collection Consistency Logic](#collection-consistency-logic)
+- [Cross-Collection Architecture Bucketing](#cross-collection-architecture-bucketing)
+- [Output Files](#output-files)
+- [Implementation Modules](#implementation-modules)
+- [API Request Details](#api-request-details)
+- [Caching](#caching)
+- [Resumable Run State](#resumable-run-state)
+- [Rate Limiting And Operational Safety](#rate-limiting-and-operational-safety)
+- [Edge Cases](#edge-cases)
+- [Sampling Strategy](#sampling-strategy)
+- [Architecture Labels](#architecture-labels)
+- [Validation Plan](#validation-plan)
+- [Open Questions](#open-questions)
+- [Proposed Initial Milestone](#proposed-initial-milestone)
+- [Pseudocode](#pseudocode)
+- [Notes For Future Implementation](#notes-for-future-implementation)
+- [Addendum: Separate Architecture Identity From Observation Metadata](#addendum-separate-architecture-identity-from-observation-metadata)
+
 ## Purpose
 
 Develop a script that identifies common object architectures in the Brown Digital Repository so future ingesters can see which parent/child/datastream patterns are already common and supported without custom development.
@@ -1024,3 +1051,145 @@ def main():
 - Include warnings prominently; architecture reports will otherwise look more definitive than the sampled data supports.
 - Treat this as architecture discovery, not repository integrity validation.
 - Review the output with BDR maintainers before turning common architectures into official ingest guidance.
+
+## Addendum: Separate Architecture Identity From Observation Metadata
+
+Follow-up review of `Understand_Project_and_`children_truncated`.md` raised an important naming and modeling issue.
+
+The project goal is to discover common object architectures. In that context, a "signature" should ideally mean a stable identifier for a normalized object architecture. The current implementation includes `children_truncated` in the dictionary that gets hashed as `signature_hash`. That makes the current hash closer to an observation/check signature:
+
+```text
+architecture shape + scan completeness metadata
+```
+
+rather than a pure architecture signature:
+
+```text
+architecture shape only
+```
+
+`children_truncated` is valuable, but it describes the completeness of the observation, not the object architecture itself. It should remain visible in output and state so incomplete evidence is auditable, but it probably should not define architecture identity.
+
+### Recommended Naming
+
+Use names that make the distinction explicit:
+
+- `architecture_signature`
+  - normalized parent/child/datastream shape
+  - intended to identify the architecture
+- `architecture_signature_hash`
+  - hash of `architecture_signature`
+  - primary grouping key for common architectures
+- `observation_metadata`
+  - scan/check information, not architecture identity
+  - examples: `children_truncated`, fetched child count, child `numFound`, `fetch_all_children`, sample strategy, row limits
+- `observation_signature`
+  - optional combined structure for audit/debugging
+  - may include both `architecture_signature` and `observation_metadata`
+- `observation_signature_hash`
+  - optional hash of `observation_signature`
+  - useful only if the implementation wants a separate key for "same architecture under same observation conditions"
+
+Avoid using the bare name `signature_hash` in new output if two different signature concepts exist.
+
+### Recommended Data Shape
+
+For each sampled parent item, store something like:
+
+```json
+{
+  "architecture_signature_hash": "abc123...",
+  "architecture_signature": {
+    "object_type": "implicit-set",
+    "datastreams": ["MODS", "RELS-EXT", "rightsMetadata"],
+    "child_count_bucket": "many:10+",
+    "child_groups": [
+      {
+        "object_type": "image",
+        "display_label": "",
+        "datastreams": ["JP2", "MODS", "RELS-EXT", "rightsMetadata", "thumbnail"],
+        "count_bucket": "many:10+"
+      }
+    ]
+  },
+  "observation_metadata": {
+    "children_truncated": true,
+    "fetched_child_count": 500,
+    "child_num_found": 900,
+    "fetch_all_children": false
+  }
+}
+```
+
+The architecture hash should be computed only from `architecture_signature`.
+
+The observation metadata should be attached to item examples, collection summaries, and architecture candidates. It should be reported as warnings or caveats when any contributing item is truncated.
+
+### Implementation Options
+
+Option 1: Replace current grouping key with a pure architecture hash.
+
+- Remove `children_truncated` from the hashed architecture structure.
+- Keep `children_truncated` in per-item observation metadata.
+- Group common architectures by `architecture_signature_hash`.
+- Add candidate-level metrics:
+  - `observed_item_count`
+  - `truncated_observation_count`
+  - `complete_observation_count`
+  - `has_truncated_observations`
+- This best matches the project goal.
+
+Option 2: Keep both hashes during a transition.
+
+- Continue writing the current `signature_hash` for backward compatibility, but rename or duplicate it as `observation_signature_hash`.
+- Add new `architecture_signature_hash`.
+- Use `architecture_signature_hash` for collection consistency and cross-collection architecture bucketing.
+- Use `observation_signature_hash` only for debugging and audit trails.
+- This is safest if existing output files or state files need a migration path.
+
+Option 3: Keep truncated observations separate but linked.
+
+- Use pure architecture identity for complete observations.
+- For truncated observations, still compute `architecture_signature_hash`, but mark confidence as incomplete.
+- Report incomplete observations under the same architecture candidate, with clear caveats.
+- Do not let truncated observations alone establish that an architecture is fully known.
+
+### Recommended Update
+
+Implement Option 2 first, then eventually remove the ambiguous current `signature_hash` name.
+
+Proposed near-term behavior:
+
+1. Change `build_item_signature()` into two functions:
+   - `build_architecture_signature(parent_doc, child_docs, args)`.
+   - `build_observation_metadata(parent_doc, child_docs, child_num_found, children_truncated, args)`.
+2. Hash only `architecture_signature` for `architecture_signature_hash`.
+3. Store the hash in state as `parent_item_architecture_hashes`.
+4. Update `ArchitectureIndex` to group by `architecture_signature_hash`.
+5. Preserve truncation as candidate and example metadata:
+   - candidate has `has_truncated_observations`.
+   - candidate has `truncated_observation_count`.
+   - example items include `children_truncated`.
+6. Update JSON and Markdown report labels:
+   - use `Architecture signature` for identity
+   - use `Observation caveats` or `Observation metadata` for scan completeness
+7. Keep a backward-compatibility note for old state files, because existing state keys such as `parent_item_signature_hashes` and `signature_hash` would no longer mean exactly the same thing.
+
+### Why This Matters
+
+If `children_truncated` stays inside the primary hash, the report can split one real architecture into two buckets:
+
+- complete observation of architecture A
+- truncated observation of architecture A
+
+That protects against overclaiming, but it makes the hash less useful as the architecture identifier the project needs.
+
+Separating architecture identity from observation metadata allows the report to say:
+
+```text
+These objects appear to share architecture A.
+Some examples were observed completely.
+Some examples were truncated and need caution or follow-up.
+```
+
+That better supports the goal of documenting common BDR object architectures while still preserving the uncertainty introduced by API limits and scan settings.

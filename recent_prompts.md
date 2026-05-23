@@ -123,3 +123,23 @@ Have it include:
 - Add this prompt to `bdr_standard_architectures/recent_prompts.md`.
 
 ---
+
+Goal: Explore options for saving a signature that reflects the object-architecture.
+
+Context:
+
+- Since the goal of this is to gather data to establish common object-architectures. I had thought the "signature" was a unique identifier for a unique object-architecture.
+
+- However, review `bdr_standard_architectures/Understand_Project_and_`children_truncated`.md`
+
+Goal: 
+
+- propose ways the code could be updated to have a signature that reflects the object-architecture.
+
+- it's ok if it's an additional signature, as long as the names are clear.
+
+- Add your thoughts for a possible update to an addendum to `bdr_standard_architectures/PLAN__determine_most_common_architectures.md`
+
+- Add this prompt to `bdr_standard_architectures/recent_prompts.md`.
+
+---
