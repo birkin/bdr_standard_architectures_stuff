@@ -33,7 +33,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--max-collections', type=int, default=20)
     parser.add_argument('--max-items-per-collection', type=int, default=100)
     parser.add_argument('--rows', type=int, default=100)
-    parser.add_argument('--sleep-seconds', type=float, default=0.25)
+    parser.add_argument('--sleep-seconds', type=float, default=0.5)
     parser.add_argument('--output-json', default=DEFAULT_OUTPUT_JSON)
     parser.add_argument('--output-md', default=DEFAULT_OUTPUT_MD)
     parser.add_argument('--cache-dir', default=DEFAULT_CACHE_DIR)

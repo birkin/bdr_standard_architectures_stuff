@@ -31,7 +31,7 @@ def build_args(**overrides: object) -> argparse.Namespace:
         'max_collections': 20,
         'max_items_per_collection': 100,
         'rows': 100,
-        'sleep_seconds': 0.25,
+        'sleep_seconds': 0.5,
         'output_json': DEFAULT_OUTPUT_JSON,
         'output_md': DEFAULT_OUTPUT_MD,
         'cache_dir': DEFAULT_CACHE_DIR,

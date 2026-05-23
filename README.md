@@ -71,7 +71,7 @@ uv run ./main.py \
   --max-collections 20 \
   --max-items-per-collection 100 \
   --rows 100 \
-  --sleep-seconds 0.25 \
+  --sleep-seconds 0.5 \
   --output-json ../bdr_standard_architectures_output/common_architectures.json \
   --output-md ../bdr_standard_architectures_output/common_architectures.md \
   --cache-dir ../bdr_standard_architectures_output/architecture_cache \
@@ -349,7 +349,7 @@ Why that is useful:
 
 #### `--sleep-seconds`
 
-Default: `0.25`
+Default: `0.5`
 
 What it does:
 
