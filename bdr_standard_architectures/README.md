@@ -1,5 +1,17 @@
 # bdr_standard_architectures
 
+## Table Of Contents
+
+- [Purpose](#purpose)
+- [Usage](#usage)
+- [Expanded Default Command](#expanded-default-command)
+- [Installation](#installation)
+- [Follow-Up Scans](#follow-up-scans)
+- [Program Flow](#program-flow)
+- [Argument Reference](#argument-reference)
+- [Outputs](#outputs)
+- [Reading The Code](#reading-the-code)
+
 ## Purpose
 
 This project identifies common object architectures in the Brown Digital Repository (BDR).
@@ -8,7 +20,7 @@ It samples BDR collections, looks at top-level objects and their direct children
 
 The practical goal is to support future ingest planning: when an architecture is common in the BDR, it is more likely to be a pattern the repository already supports without custom development.
 
-## Quick Start
+## Usage
 
 Show all CLI options:
 
@@ -85,7 +97,25 @@ The boolean flags are false when omitted. The default run does not set:
 - `--include-mime-types`
 - `--fetch-all-children`
 
-This section is intentionally separate from Quick Start so the normal usage stays easy to scan.
+This section is intentionally separate from Usage so the normal commands stay easy to scan.
+
+## Installation
+
+Assumptions:
+
+- `git` is installed.
+- GitHub SSH access is configured for this repository.
+- `uv` is installed. If not, install it using the [Astral uv installation documentation](https://docs.astral.sh/uv/getting-started/installation/).
+
+```bash
+mkdir -p ~/stuff
+cd ~/stuff
+git clone git@github.com:birkin/bdr_standard_architectures_stuff.git
+cd bdr_standard_architectures_stuff/bdr_standard_architectures
+uv sync
+```
+
+After `uv sync` completes, see the [Usage](#usage) section above.
 
 ## Follow-Up Scans
 

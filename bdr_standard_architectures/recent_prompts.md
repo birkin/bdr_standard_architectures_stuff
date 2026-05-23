@@ -107,3 +107,19 @@ questions:
 - Add this prompt to `bdr_standard_architectures/recent_prompts.md`.
 
 ---
+
+After the `Expanded Default Command` section, and an `Installation` section.
+
+Have it include:
+- assumption that `uv` is installed, with a link to the atral-uv-installation web-page.
+- cd-ing to a `stuff` directory
+- running the git-clone command
+- running uv sync
+
+...and then referring folk to the "Usage" section above.
+
+(I may have left stuff out)
+
+- Add this prompt to `bdr_standard_architectures/recent_prompts.md`.
+
+---
