@@ -5,6 +5,14 @@ import unittest
 from pathlib import Path
 
 from lib.classification import classify_collection
+from lib.config import (
+    DEFAULT_CACHE_DIR,
+    DEFAULT_OUTPUT_JSON,
+    DEFAULT_OUTPUT_MD,
+    DEFAULT_OUTPUT_ROOT,
+    DEFAULT_STATE_FILE,
+    PROJECT_ROOT,
+)
 from lib.models import ArchitectureIndex, CollectionRef
 from lib.report import render_markdown_report
 from lib.sampling import child_sort_key
@@ -24,10 +32,10 @@ def build_args(**overrides: object) -> argparse.Namespace:
         'max_items_per_collection': 100,
         'rows': 100,
         'sleep_seconds': 0.25,
-        'output_json': 'common_architectures.json',
-        'output_md': 'common_architectures.md',
-        'cache_dir': '.architecture_cache',
-        'state_file': '.architecture_cache/run_state.json',
+        'output_json': DEFAULT_OUTPUT_JSON,
+        'output_md': DEFAULT_OUTPUT_MD,
+        'cache_dir': DEFAULT_CACHE_DIR,
+        'state_file': DEFAULT_STATE_FILE,
         'refresh_cache': False,
         'refresh_state': False,
         'no_resume': False,
@@ -51,6 +59,21 @@ def build_args(**overrides: object) -> argparse.Namespace:
 
 
 class TestMain(unittest.TestCase):
+    def test_default_output_paths_are_outside_project_root(self) -> None:
+        """
+        Checks that generated default paths live in the sibling output directory.
+        """
+        default_paths = [
+            Path(DEFAULT_OUTPUT_JSON),
+            Path(DEFAULT_OUTPUT_MD),
+            Path(DEFAULT_CACHE_DIR),
+            Path(DEFAULT_STATE_FILE),
+        ]
+
+        for default_path in default_paths:
+            self.assertTrue(default_path.resolve().is_relative_to(DEFAULT_OUTPUT_ROOT.resolve()))
+            self.assertFalse(default_path.resolve().is_relative_to(PROJECT_ROOT.resolve()))
+
     def test_parse_datastreams_returns_sorted_ids(self) -> None:
         """
         Checks that datastream JSON is normalized to sorted IDs.

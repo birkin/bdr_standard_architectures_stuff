@@ -36,10 +36,12 @@ uv run ./main.py
 
 The default run writes:
 
-- `common_architectures.json`
-- `common_architectures.md`
-- `.architecture_cache/run_state.json`
-- cached API responses in `.architecture_cache/`
+- `../bdr_standard_architectures_output/common_architectures.json`
+- `../bdr_standard_architectures_output/common_architectures.md`
+- `../bdr_standard_architectures_output/architecture_cache/run_state.json`
+- cached API responses in `../bdr_standard_architectures_output/architecture_cache/`
+
+The defaults are resolved as paths in a sibling directory of this project root, not inside the directory that contains `.git/`.
 
 ## Program Flow
 
@@ -273,7 +275,7 @@ Why that is useful:
 
 #### `--output-json`
 
-Default: `common_architectures.json`
+Default: `../bdr_standard_architectures_output/common_architectures.json`
 
 What it does:
 
@@ -285,7 +287,7 @@ Why that is useful:
 
 #### `--output-md`
 
-Default: `common_architectures.md`
+Default: `../bdr_standard_architectures_output/common_architectures.md`
 
 What it does:
 
@@ -299,7 +301,7 @@ Why that is useful:
 
 #### `--cache-dir`
 
-Default: `.architecture_cache`
+Default: `../bdr_standard_architectures_output/architecture_cache`
 
 What it does:
 
@@ -311,7 +313,7 @@ Why that is useful:
 
 #### `--state-file`
 
-Default: `.architecture_cache/run_state.json`
+Default: `../bdr_standard_architectures_output/architecture_cache/run_state.json`
 
 What it does:
 

@@ -2,7 +2,14 @@ import argparse
 import logging
 from pathlib import Path
 
-from lib.config import DEFAULT_API_ROOT, LOG_LEVEL
+from lib.config import (
+    DEFAULT_API_ROOT,
+    DEFAULT_CACHE_DIR,
+    DEFAULT_OUTPUT_JSON,
+    DEFAULT_OUTPUT_MD,
+    DEFAULT_STATE_FILE,
+    LOG_LEVEL,
+)
 from lib.report import render_markdown_report
 from lib.sampler import run_sampler
 from lib.utils import write_json, write_markdown
@@ -27,10 +34,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--max-items-per-collection', type=int, default=100)
     parser.add_argument('--rows', type=int, default=100)
     parser.add_argument('--sleep-seconds', type=float, default=0.25)
-    parser.add_argument('--output-json', default='common_architectures.json')
-    parser.add_argument('--output-md', default='common_architectures.md')
-    parser.add_argument('--cache-dir', default='.architecture_cache')
-    parser.add_argument('--state-file', default='.architecture_cache/run_state.json')
+    parser.add_argument('--output-json', default=DEFAULT_OUTPUT_JSON)
+    parser.add_argument('--output-md', default=DEFAULT_OUTPUT_MD)
+    parser.add_argument('--cache-dir', default=DEFAULT_CACHE_DIR)
+    parser.add_argument('--state-file', default=DEFAULT_STATE_FILE)
     parser.add_argument('--refresh-cache', action='store_true')
     parser.add_argument('--refresh-state', action='store_true')
     parser.add_argument('--no-resume', action='store_true')
