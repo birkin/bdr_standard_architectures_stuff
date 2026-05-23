@@ -51,7 +51,7 @@ def build_args(**overrides: object) -> argparse.Namespace:
         'fetch_all_children': False,
         'sample_strategy': 'first',
         'random_seed': 0,
-        'min_sample_size': 5,
+        'min_sample_size': 10,
     }
     defaults.update(overrides)
     args = argparse.Namespace(**defaults)

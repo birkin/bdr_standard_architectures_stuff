@@ -95,3 +95,5 @@ Tasks:
 - Ensure all default output paths are _not_ in the project-root (where the .git/ directory lives). Set all default output paths to the sibling directory of the project-root.
 
   Add this prompt to `bdr_standard_architectures/recent_prompts.md`.
+
+---

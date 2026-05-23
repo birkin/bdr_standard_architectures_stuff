@@ -520,11 +520,12 @@ Why that is useful:
 
 #### `--min-sample-size`
 
-Default: `5`
+Default: `10`
 
 What it does:
 
 - Sets the minimum number of sampled top-level items needed before a collection can be classified as uniform, mostly uniform, or mixed.
+- This is only a confidence floor for classification; it does not cap how many sampled items are used. If 100 parent objects are sampled, all 100 are used.
 
 Why that is useful:
 

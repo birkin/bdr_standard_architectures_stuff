@@ -53,7 +53,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--fetch-all-children', action='store_true')
     parser.add_argument('--sample-strategy', default='first', choices=['first', 'evenly-spaced', 'random'])
     parser.add_argument('--random-seed', type=int, default=0)
-    parser.add_argument('--min-sample-size', type=int, default=5)
+    parser.add_argument('--min-sample-size', type=int, default=10)
     args = parser.parse_args()
     return args
 
