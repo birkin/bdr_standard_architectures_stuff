@@ -1,7 +1,8 @@
 __pycache__
+.architecture_cache/
 .DS_Store
+.ruff_cache
 .venv
 *.pyc
-.architecture_cache/
 common_architectures.json
 common_architectures.md
