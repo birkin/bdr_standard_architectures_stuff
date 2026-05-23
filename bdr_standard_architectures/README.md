@@ -43,6 +43,78 @@ The default run writes:
 
 The defaults are resolved as paths in a sibling directory of this project root, not inside the directory that contains `.git/`.
 
+## Expanded Default Command
+
+The minimal command:
+
+```bash
+uv run ./main.py
+```
+
+is equivalent to the following value-taking arguments:
+
+```bash
+uv run ./main.py \
+  --api-root https://repository.library.brown.edu/api/ \
+  --max-collections 20 \
+  --max-items-per-collection 100 \
+  --rows 100 \
+  --sleep-seconds 0.25 \
+  --output-json ../bdr_standard_architectures_output/common_architectures.json \
+  --output-md ../bdr_standard_architectures_output/common_architectures.md \
+  --cache-dir ../bdr_standard_architectures_output/architecture_cache \
+  --state-file ../bdr_standard_architectures_output/architecture_cache/run_state.json \
+  --full-item-validation-sample 0 \
+  --collection-query-mode public-top-level \
+  --collection-pids "" \
+  --skip-collections "" \
+  --min-consistency-percent 90.0 \
+  --top-architectures 25 \
+  --sample-strategy first \
+  --random-seed 0 \
+  --min-sample-size 10
+```
+
+The boolean flags are false when omitted. The default run does not set:
+
+- `--refresh-cache`
+- `--refresh-state`
+- `--no-resume`
+- `--include-private`
+- `--include-singletons`
+- `--include-mime-types`
+- `--fetch-all-children`
+
+This section is intentionally separate from Quick Start so the normal usage stays easy to scan.
+
+## Follow-Up Scans
+
+The default run scans the largest 20 selected collections because `--max-collections` defaults to `20`.
+
+At the moment, the script cannot append "the next 10 collections" to the same completed default run state by simply changing `--max-collections` from `20` to `30`. The state file validates material parameters before resuming, and `max_collections` is one of those material parameters. That means a second run with `--max-collections 30` and the same state file will stop with a state-compatibility error unless you reset or separate the state.
+
+To produce a 30-collection report, run a new analysis:
+
+```bash
+uv run ./main.py \
+  --max-collections 30 \
+  --refresh-state
+```
+
+That reruns the analysis state from scratch, but it can still reuse cached API responses unless `--refresh-cache` is also set.
+
+To inspect 10 known additional collections separately, use explicit collection PIDs and separate output/state files:
+
+```bash
+uv run ./main.py \
+  --collection-pids bdr:example1,bdr:example2,bdr:example3 \
+  --output-json ../bdr_standard_architectures_output/additional_architectures.json \
+  --output-md ../bdr_standard_architectures_output/additional_architectures.md \
+  --state-file ../bdr_standard_architectures_output/architecture_cache/additional_run_state.json
+```
+
+That does not merge the new scan into the original report; it creates a separate targeted report.
+
 ## Program Flow
 
 ### 1. Parse CLI Arguments

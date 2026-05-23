@@ -97,3 +97,13 @@ Tasks:
   Add this prompt to `bdr_standard_architectures/recent_prompts.md`.
 
 ---
+
+questions: 
+
+- if I just run the script in the most minimal way, what would be the equivalent all-argument command? (Add that to an appropriate place in the documentation -- but not in a place where it confuses easy Usage instructions).
+
+- if I run the script in the most minimal way, and it goes through X collections (I think the default is 20, yes?). If I then want to check an _additional_, say, 10 collections, what would the follow up command be -- _if_ it's even possible to "build on" previous work. (If it's not, that's ok -- I'm not asking you to add that functionality if it's not there.)
+
+- Add this prompt to `bdr_standard_architectures/recent_prompts.md`.
+
+---
