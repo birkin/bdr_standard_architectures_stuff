@@ -54,7 +54,7 @@ What it does:
 
 Why that is useful:
 
-- The sampler has many controls, but they all map to one of a few concerns: API safety, scan scope, sampling quality, resumability, architecture identity, or output filtering.
+- The sampler has many controls, but they all map to one of a few concerns: API-friendly request behavior, scan scope, sampling quality, resumability, architecture identity, or output filtering.
 
 ### 2. Create API Client, Cache, And State
 
@@ -123,7 +123,7 @@ What it does:
 
 Why that is useful:
 
-- Common architectures are most likely to appear in large collections.
+- Common architectures may be most likely to appear in large collections.
 - Saving the selected list makes resumed runs deterministic.
 
 ### 6. Sample Top-Level Items
@@ -132,7 +132,7 @@ Why that is useful:
 
 What it does:
 
-- Uses `--sample-strategy` to choose `first`, `evenly-spaced`, or `random`.
+- Uses `--sample-strategy` to choose `first`, `evenly-spaced`, or `random`; the default is `first`.
 - Limits per-collection parent sampling with `--max-items-per-collection`.
 - Limits page size with `--rows`.
 - Requests only fields needed for architecture detection.
@@ -323,6 +323,8 @@ Why that is useful:
 
 #### `--refresh-cache`
 
+Default: false
+
 What it does:
 
 - Ignores existing cached API responses and writes fresh cache entries.
@@ -334,6 +336,8 @@ Why that is useful:
 
 #### `--refresh-state`
 
+Default: false
+
 What it does:
 
 - Starts with new resumable state even if `--state-file` already exists.
@@ -343,6 +347,8 @@ Why that is useful:
 - Use this when changing scan parameters intentionally or when previous progress should not be reused.
 
 #### `--no-resume`
+
+Default: false
 
 What it does:
 
@@ -625,4 +631,3 @@ The main code paths are:
 - `lib/models.py`: collection and architecture index models.
 - `lib/report.py`: JSON result assembly and Markdown rendering.
 - `lib/utils.py`: small shared helpers.
-
