@@ -424,6 +424,7 @@ signatures:
     description: Observed pdf object definition through public BDR API sampling.
     exemplar_pids:
     - bdr:7dmq3aws
+    - bdr:5zhk8zdv
     observed_count: 1
     signature:
       object_type: pdf
@@ -460,10 +461,505 @@ signatures:
     description: Observed pdf object definition through public BDR API sampling.
     exemplar_pids:
     - bdr:hbndrbkd
+    - bdr:abdn9h3p
+    - bdr:vk2xkg6w
+    observed_count: 23
+    signature:
+      object_type: pdf
+      typeOfResource: text
+      has_parent: true
+      has_children: false
+      is_ordered: true
+      datastream_ids:
+      - MODS
+      - PDF
+      - RELS-EXT
+      - RELS-INT
+      - irMetadata
+      - rightsMetadata
+      - thumbnail
+      datastream_details:
+      - id: MODS
+        mime_type: text/xml
+      - id: PDF
+        mime_type: application/pdf
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+      - id: thumbnail
+        mime_type: image/jpeg
+  pdf_object_definition_aa7126c65f82:
+    signature_hash: aa7126c65f82
+    label: pdf object definition
+    description: Observed pdf object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1102287
+    - bdr:1148124
+    observed_count: 2
+    signature:
+      object_type: pdf
+      typeOfResource: text
+      has_parent: false
+      has_children: true
+      is_ordered: false
+      datastream_ids:
+      - DC
+      - MODS
+      - PDF
+      - RELS-EXT
+      - RELS-INT
+      - irMetadata
+      - rightsMetadata
+      - thumbnail
+      datastream_details:
+      - id: DC
+        mime_type: application/octet-stream
+      - id: MODS
+        mime_type: text/xml
+      - id: PDF
+        mime_type: application/pdf
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+      - id: thumbnail
+        mime_type: image/jpeg
+  pdf_object_definition_091cc58a6c3b:
+    signature_hash: 091cc58a6c3b
+    label: pdf object definition
+    description: Observed pdf object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1102288
+    - bdr:1102289
+    - bdr:1102290
+    observed_count: 34
+    signature:
+      object_type: pdf
+      typeOfResource: text
+      has_parent: true
+      has_children: false
+      is_ordered: true
+      datastream_ids:
+      - DC
+      - MODS
+      - PDF
+      - RELS-EXT
+      - RELS-INT
+      - irMetadata
+      - rightsMetadata
+      - thumbnail
+      datastream_details:
+      - id: DC
+        mime_type: application/octet-stream
+      - id: MODS
+        mime_type: text/xml
+      - id: PDF
+        mime_type: application/pdf
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+      - id: thumbnail
+        mime_type: image/jpeg
+  pdf_object_definition_07bc58a8abdd:
+    signature_hash: 07bc58a8abdd
+    label: pdf object definition
+    description: Observed pdf object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:592rayx5
+    observed_count: 1
+    signature:
+      object_type: pdf
+      typeOfResource: journals
+      has_parent: false
+      has_children: true
+      is_ordered: false
+      datastream_ids:
+      - MODS
+      - PDF
+      - RELS-EXT
+      - RELS-INT
+      - irMetadata
+      - rightsMetadata
+      datastream_details:
+      - id: MODS
+        mime_type: text/xml
+      - id: PDF
+        mime_type: application/pdf
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+  pdf_object_definition_3e1f46eaab03:
+    signature_hash: 3e1f46eaab03
+    label: pdf object definition
+    description: Observed pdf object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:s25vu69v
+    - bdr:t7u64nwf
+    - bdr:86es2jcd
+    observed_count: 77
+    signature:
+      object_type: pdf
+      typeOfResource: articles
+      has_parent: true
+      has_children: false
+      is_ordered: true
+      datastream_ids:
+      - MODS
+      - PDF
+      - RELS-EXT
+      - RELS-INT
+      - irMetadata
+      - rightsMetadata
+      - thumbnail
+      datastream_details:
+      - id: MODS
+        mime_type: text/xml
+      - id: PDF
+        mime_type: application/pdf
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+      - id: thumbnail
+        mime_type: image/jpeg
+  pdf_object_definition_72e671a286f1:
+    signature_hash: 72e671a286f1
+    label: pdf object definition
+    description: Observed pdf object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:z4yyvvnm
+    - bdr:8agx9bp9
+    - bdr:dzrpgybd
+    observed_count: 39
+    signature:
+      object_type: pdf
+      typeOfResource: text_resources
+      has_parent: true
+      has_children: false
+      is_ordered: true
+      datastream_ids:
+      - MODS
+      - PDF
+      - RELS-EXT
+      - RELS-INT
+      - irMetadata
+      - rightsMetadata
+      - thumbnail
+      datastream_details:
+      - id: MODS
+        mime_type: text/xml
+      - id: PDF
+        mime_type: application/pdf
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+      - id: thumbnail
+        mime_type: image/jpeg
+  pdf_object_definition_9a15f14b2c5f:
+    signature_hash: 9a15f14b2c5f
+    label: pdf object definition
+    description: Observed pdf object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:mxc624ck
+    - bdr:g7mm7ny2
+    - bdr:wn53g272
+    observed_count: 8
+    signature:
+      object_type: pdf
+      typeOfResource: reviews
+      has_parent: true
+      has_children: false
+      is_ordered: true
+      datastream_ids:
+      - MODS
+      - PDF
+      - RELS-EXT
+      - RELS-INT
+      - irMetadata
+      - rightsMetadata
+      - thumbnail
+      datastream_details:
+      - id: MODS
+        mime_type: text/xml
+      - id: PDF
+        mime_type: application/pdf
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+      - id: thumbnail
+        mime_type: image/jpeg
+  pdf_object_definition_adc9349f79b2:
+    signature_hash: adc9349f79b2
+    label: pdf object definition
+    description: Observed pdf object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:7np8t6fv
+    - bdr:8uzgwtdv
+    - bdr:bqre5qf6
+    observed_count: 7
+    signature:
+      object_type: pdf
+      typeOfResource: journals
+      has_parent: false
+      has_children: true
+      is_ordered: false
+      datastream_ids:
+      - MODS
+      - PDF
+      - RELS-EXT
+      - RELS-INT
+      - irMetadata
+      - rightsMetadata
+      - thumbnail
+      datastream_details:
+      - id: MODS
+        mime_type: text/xml
+      - id: PDF
+        mime_type: application/pdf
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+      - id: thumbnail
+        mime_type: image/jpeg
+  pdf_object_definition_1525415b0c82:
+    signature_hash: 1525415b0c82
+    label: pdf object definition
+    description: Observed pdf object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:hyexwm47
+    - bdr:47e3s9cn
+    - bdr:4k4qz42b
+    observed_count: 3
+    signature:
+      object_type: pdf
+      typeOfResource: conference_proceedings
+      has_parent: true
+      has_children: false
+      is_ordered: true
+      datastream_ids:
+      - MODS
+      - PDF
+      - RELS-EXT
+      - RELS-INT
+      - irMetadata
+      - rightsMetadata
+      - thumbnail
+      datastream_details:
+      - id: MODS
+        mime_type: text/xml
+      - id: PDF
+        mime_type: application/pdf
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+      - id: thumbnail
+        mime_type: image/jpeg
+  pdf_object_definition_ef1791260418:
+    signature_hash: ef1791260418
+    label: pdf object definition
+    description: Observed pdf object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:mfw5sgs4
+    - bdr:7sbvr992
+    - bdr:wa8bw44u
+    observed_count: 6
+    signature:
+      object_type: pdf
+      typeOfResource: journals
+      has_parent: true
+      has_children: false
+      is_ordered: true
+      datastream_ids:
+      - MODS
+      - PDF
+      - RELS-EXT
+      - RELS-INT
+      - irMetadata
+      - rightsMetadata
+      - thumbnail
+      datastream_details:
+      - id: MODS
+        mime_type: text/xml
+      - id: PDF
+        mime_type: application/pdf
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+      - id: thumbnail
+        mime_type: image/jpeg
+  pdf_object_definition_9f680298bedf:
+    signature_hash: 9f680298bedf
+    label: pdf object definition
+    description: Observed pdf object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:841229
     observed_count: 1
     signature:
       object_type: pdf
       typeOfResource: text
+      has_parent: false
+      has_children: true
+      is_ordered: false
+      datastream_ids:
+      - DC
+      - MODS
+      - PDF
+      - RELS-EXT
+      - RELS-INT
+      - irMetadata
+      - rightsMetadata
+      - thumbnail
+      datastream_details:
+      - id: DC
+        mime_type: application/octet-stream
+      - id: MODS
+        mime_type: text/xml
+      - id: PDF
+        mime_type: application/pdf
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+      - id: thumbnail
+        mime_type: application/octet-stream
+  pdf_object_definition_1cfb7882432d:
+    signature_hash: 1cfb7882432d
+    label: pdf object definition
+    description: Observed pdf object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:841230
+    - bdr:841232
+    - bdr:841231
+    observed_count: 15
+    signature:
+      object_type: pdf
+      typeOfResource: text
+      has_parent: true
+      has_children: false
+      is_ordered: true
+      datastream_ids:
+      - DC
+      - MODS
+      - PDF
+      - RELS-EXT
+      - RELS-INT
+      - irMetadata
+      - rightsMetadata
+      - thumbnail
+      datastream_details:
+      - id: DC
+        mime_type: application/octet-stream
+      - id: MODS
+        mime_type: text/xml
+      - id: PDF
+        mime_type: application/pdf
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+      - id: thumbnail
+        mime_type: application/octet-stream
+  pdf_object_definition_fd7e94008b04:
+    signature_hash: fd7e94008b04
+    label: pdf object definition
+    description: Observed pdf object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:863sxpmh
+    observed_count: 1
+    signature:
+      object_type: pdf
+      typeOfResource: articles
+      has_parent: false
+      has_children: true
+      is_ordered: false
+      datastream_ids:
+      - MODS
+      - PDF
+      - RELS-EXT
+      - RELS-INT
+      - irMetadata
+      - rightsMetadata
+      datastream_details:
+      - id: MODS
+        mime_type: text/xml
+      - id: PDF
+        mime_type: application/pdf
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+  pdf_object_definition_a535f5623fc1:
+    signature_hash: a535f5623fc1
+    label: pdf object definition
+    description: Observed pdf object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:9b3n95rk
+    - bdr:q88bnza3
+    - bdr:7bf26s5q
+    observed_count: 3
+    signature:
+      object_type: pdf
+      typeOfResource: other
       has_parent: true
       has_children: false
       is_ordered: true

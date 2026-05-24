@@ -213,3 +213,27 @@ signatures:
         status: unknown
         years: unknown
         computed_current_status: unknown
+  open_access_evidence_3bb0bf3f8f84:
+    signature_hash: 3bb0bf3f8f84
+    label: open access evidence
+    description: Observed open access evidence through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1102287
+    - bdr:1148124
+    - bdr:592rayx5
+    observed_count: 13
+    signature:
+      license: unknown
+      rights_statement: unknown
+      restriction_statement: unknown
+      access_control:
+        public:
+        - 'True'
+        brown:
+        - 'False'
+        private:
+        - 'False'
+      current_embargo_status:
+        status: unknown
+        years: unknown
+        computed_current_status: unknown

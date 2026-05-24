@@ -276,3 +276,168 @@ signatures:
         visibility: b1e37c0c0392
         auxiliary_relationships: 2a72e0d30047
     component_hashes: *id018
+  pdf_with_1_child_definition_type_3accee470e2a:
+    signature_hash: 3accee470e2a
+    label: pdf with 1 child definition type
+    description: Observed composite architecture through public BDR API sampling.
+    exemplar_pids: []
+    observed_count: 2
+    signature:
+      component_hashes: &id019
+        parent_relationship: 38be23280f8a
+        parent_object_definition: aa7126c65f82
+        children: fbe523235b35
+        open_access: 3bb0bf3f8f84
+        visibility: b1e37c0c0392
+        auxiliary_relationships: 2a72e0d30047
+    component_hashes: *id019
+  pdf_with_2_child_definition_types_cf5344e5d9c1:
+    signature_hash: cf5344e5d9c1
+    label: pdf with 2 child definition types
+    description: Observed composite architecture through public BDR API sampling.
+    exemplar_pids: []
+    observed_count: 2
+    signature:
+      component_hashes: &id020
+        parent_relationship: 38be23280f8a
+        parent_object_definition: adc9349f79b2
+        children: 46b829529702
+        open_access: 3bb0bf3f8f84
+        visibility: b1e37c0c0392
+        auxiliary_relationships: 2a72e0d30047
+    component_hashes: *id020
+  pdf_with_3_child_definition_types_9bf1624c4559:
+    signature_hash: 9bf1624c4559
+    label: pdf with 3 child definition types
+    description: Observed composite architecture through public BDR API sampling.
+    exemplar_pids: []
+    observed_count: 1
+    signature:
+      component_hashes: &id021
+        parent_relationship: 38be23280f8a
+        parent_object_definition: 07bc58a8abdd
+        children: a6490fe676f4
+        open_access: 3bb0bf3f8f84
+        visibility: b1e37c0c0392
+        auxiliary_relationships: 2a72e0d30047
+    component_hashes: *id021
+  pdf_with_1_child_definition_type_f958a5405f3c:
+    signature_hash: f958a5405f3c
+    label: pdf with 1 child definition type
+    description: Observed composite architecture through public BDR API sampling.
+    exemplar_pids: []
+    observed_count: 1
+    signature:
+      component_hashes: &id022
+        parent_relationship: 38be23280f8a
+        parent_object_definition: 2078c8d781d6
+        children: a23b9156d303
+        open_access: 3bb0bf3f8f84
+        visibility: b1e37c0c0392
+        auxiliary_relationships: 2a72e0d30047
+    component_hashes: *id022
+  pdf_with_4_child_definition_types_d1613e310bd6:
+    signature_hash: d1613e310bd6
+    label: pdf with 4 child definition types
+    description: Observed composite architecture through public BDR API sampling.
+    exemplar_pids: []
+    observed_count: 1
+    signature:
+      component_hashes: &id023
+        parent_relationship: 38be23280f8a
+        parent_object_definition: adc9349f79b2
+        children: 6bb6a11e173b
+        open_access: 3bb0bf3f8f84
+        visibility: b1e37c0c0392
+        auxiliary_relationships: 2a72e0d30047
+    component_hashes: *id023
+  pdf_with_1_child_definition_type_23e5f8a3b00c:
+    signature_hash: 23e5f8a3b00c
+    label: pdf with 1 child definition type
+    description: Observed composite architecture through public BDR API sampling.
+    exemplar_pids: []
+    observed_count: 1
+    signature:
+      component_hashes: &id024
+        parent_relationship: 38be23280f8a
+        parent_object_definition: 9f680298bedf
+        children: bf2f39924eb5
+        open_access: 3bb0bf3f8f84
+        visibility: b1e37c0c0392
+        auxiliary_relationships: 2a72e0d30047
+    component_hashes: *id024
+  pdf_with_1_child_definition_type_6f66a47c79a4:
+    signature_hash: 6f66a47c79a4
+    label: pdf with 1 child definition type
+    description: Observed composite architecture through public BDR API sampling.
+    exemplar_pids: []
+    observed_count: 1
+    signature:
+      component_hashes: &id025
+        parent_relationship: 38be23280f8a
+        parent_object_definition: fd7e94008b04
+        children: 175fab85d108
+        open_access: 3bb0bf3f8f84
+        visibility: b1e37c0c0392
+        auxiliary_relationships: 2a72e0d30047
+    component_hashes: *id025
+  pdf_with_4_child_definition_types_79efa2e07243:
+    signature_hash: 79efa2e07243
+    label: pdf with 4 child definition types
+    description: Observed composite architecture through public BDR API sampling.
+    exemplar_pids: []
+    observed_count: 1
+    signature:
+      component_hashes: &id026
+        parent_relationship: 38be23280f8a
+        parent_object_definition: adc9349f79b2
+        children: 9d698fd45760
+        open_access: 3bb0bf3f8f84
+        visibility: b1e37c0c0392
+        auxiliary_relationships: 2a72e0d30047
+    component_hashes: *id026
+  pdf_with_3_child_definition_types_6f7e6e653b0c:
+    signature_hash: 6f7e6e653b0c
+    label: pdf with 3 child definition types
+    description: Observed composite architecture through public BDR API sampling.
+    exemplar_pids: []
+    observed_count: 1
+    signature:
+      component_hashes: &id027
+        parent_relationship: 38be23280f8a
+        parent_object_definition: adc9349f79b2
+        children: 200dbf90c185
+        open_access: 3bb0bf3f8f84
+        visibility: b1e37c0c0392
+        auxiliary_relationships: 2a72e0d30047
+    component_hashes: *id027
+  pdf_with_4_child_definition_types_7590a7471277:
+    signature_hash: 7590a7471277
+    label: pdf with 4 child definition types
+    description: Observed composite architecture through public BDR API sampling.
+    exemplar_pids: []
+    observed_count: 1
+    signature:
+      component_hashes: &id028
+        parent_relationship: 38be23280f8a
+        parent_object_definition: adc9349f79b2
+        children: 87851fe63619
+        open_access: 3bb0bf3f8f84
+        visibility: b1e37c0c0392
+        auxiliary_relationships: 2a72e0d30047
+    component_hashes: *id028
+  pdf_with_1_child_definition_type_1229433d2fe4:
+    signature_hash: 1229433d2fe4
+    label: pdf with 1 child definition type
+    description: Observed composite architecture through public BDR API sampling.
+    exemplar_pids: []
+    observed_count: 1
+    signature:
+      component_hashes: &id029
+        parent_relationship: 38be23280f8a
+        parent_object_definition: adc9349f79b2
+        children: 175fab85d108
+        open_access: 3bb0bf3f8f84
+        visibility: b1e37c0c0392
+        auxiliary_relationships: 2a72e0d30047
+    component_hashes: *id029
