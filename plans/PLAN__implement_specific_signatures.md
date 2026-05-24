@@ -23,7 +23,7 @@
 
 ## Purpose
 
-Update the current BDR architecture sampler so it captures smaller, named, human-readable signature dimensions and composes them into composite architecture signatures.
+Update the current BDR architecture sampler so it captures smaller, named, machine-and-human-readable signature dimensions and composes them into composite architecture signatures.
 
 The implementation should preserve as much of the current working behavior as reasonably possible:
 
@@ -37,6 +37,17 @@ The implementation should preserve as much of the current working behavior as re
 - Default sampling of 100 top-level parent items per collection.
 
 The main change is that the current single coarse parent/children architecture signature should become an output of several dimension signatures, with enough evidence saved to build YAML specification files and human-reviewable reports.
+
+Example new files:
+
+```
+specifications/parent_relationship_signatures.yaml
+specifications/object_definition_signatures.yaml
+specifications/open_access_signatures.yaml
+specifications/visibility_signatures.yaml
+specifications/auxiliary_relationships_signatures.yaml
+specifications/composite_architecture_signatures.yaml
+```
 
 Important implementation correction: the current coarse signature includes `children_truncated` inside the hashed signature. In the new architecture, child truncation/sampling status should move to observation/evidence metadata and should not participate in dimension or composite identity.
 
@@ -149,6 +160,9 @@ The composite needs a stable way to represent the set of observed child object d
   - `display_label`, only if the implementation decides labels are architectural for child roles.
 
 By default, do not create a separate YAML file for child profiles. The profile can be a composite component derived from object-definition signatures. Add a separate `child_object_profile_signatures.yaml` only if review shows the profile itself needs labels, descriptions, examples, or reuse across composites.
+
+FEEDBACK: I'm thinking we should have an additional: `specifications/children_signatures.yaml` -- made up of the sorted unique object-definition-signatures discovered when going through the child-objects.
+
 
 ### 3. Composite Architecture Signature
 
@@ -707,23 +721,57 @@ uv run ./main.py \
 ## Open Decisions For Implementation Session
 
 - Exact public API/Solr field name for `typeOfResource`.
+    - FEEDBACK: typeOfResource: Solr field is mods_type_of_resource.
+
 - Exact public API/Solr field name for license or rights statement.
+    - FEEDBACK: 
+        - License / rights statement: there are two different things. Rights/access control from rightsMetadata indexes to discover, display, modify, delete, Hydra-style *_access_*_ssim, and display booleans _display_public_bsi, _display_brown_bsi, _display_private_bsi
+        - MODS rights/license-ish display fields come from mods:accessCondition: mods_access_condition_use_text_tsim, mods_access_condition_use_link_ssim, mods_access_condition_rights_text_tsim, mods_access_condition_rights_link_ssim, and mods_access_condition_restriction_text_tsim
+        - not all of those may be public; do your best.
+
 - Whether current embargo status is publicly observable.
+    - FEEDBACK: Embargo status: yes, partly publicly observable if the object itself is publicly discoverable. RELS-EXT embargo metadata is indexed as rel_pso_status_ssi and rel_embargo_years_ssim. Embargo status: yes, partly publicly observable if the object itself is publicly discoverable. Caveat: this appears to expose recorded status/year values, not compute “currently embargoed” from exact dates.
+    RELS-EXT embargo metadata is indexed as rel_pso_status_ssi and rel_embargo_years_ssim.
+
 - Whether annotation relationships are publicly observable.
+    - FEEDBACK: Annotation relationships: yes, publicly observable when access allows the related records to be returned.
+    RELS-EXT isAnnotationOf indexes to rel_is_annotation_of_ssim via the generic rel_%s_ssim mapping. The item API
+    explicitly queries annotations and returns them under relations.hasAnnotation. Scrubbing removes private access fields inside relations, but not the relationship itself.
+
 - Whether YAML writing should add `PyYAML` or use a controlled manual emitter.
+    - FEEDBACK: sure, add that, or a package that can also validate the yaml.
+
 - Whether specification YAML writing should be opt-in from the start.
+    - FEEDBACK: There should be no opt-out option; specification-YAMLs are the core output of this tool.
+
 - Whether child object definition profile should preserve each child definition hash with count buckets, or group child definitions into a separate child-profile dimension.
+    - FEEDBACK: I'm a bit confused about this -- there is no specific "child" definition. I think you're saying that to create a composite-architecture-definition, you need to handle the type of children in some way. Correct? If so -- then I'm thinking we should have an additional: `specifications/children_signatures.yaml` -- made up of the sorted unique object-definition-signatures discovered when going through the child-objects.
+ 
+
 
 ## Questions / Decision Points For Birkin
 
 These are the main decisions that would materially affect implementation:
 
 - Should MIME types now be part of object-definition identity by default? `PLAN__consider_specific_signatures.md` says to include MIME details when available, while the current CLI has `--include-mime-types` defaulting to false.
+    - FEEDBACK: Yes, include MIME types by default.
+
 - Should child display labels such as `rel_display_label_ssi` be part of child object profile identity, or only report/evidence context? Including them may distinguish architectural child roles, but may also split otherwise equivalent structures.
+    - FEEDBACK: No; do not include them.
+
 - Should generated YAML files be considered disposable scan artifacts by default, or should the implementation avoid writing to `specifications/` unless an explicit reviewed path is provided?
+    - FEEDBACK: I don't know what you mean by "disposable" -- overwriteable? Well -- these should be built-out over time -- and since the hashes are dirived from data, not "new UUIDs" -- pre-existing ones should be added to, as long as the api-from-which-the-data is derived is the same.
+
 - Is a separate child-profile specification file desirable now, or should child profiles stay as derived composite components until there is evidence they need independent curation?
+    - FEEDBACK: I addressed this above.
+
 - Should `--fetch-all-children` still fetch all direct children regardless of count, or should there be a hard safety ceiling to prevent unexpectedly huge scans?
+    FEEDBACK: make it max of 1,000 -- and update the flag-wording to indicate that.
+
 - Should old coarse JSON keys such as `architectures` and `common_architecture_candidates` be preserved as aliases for one release, or is a clean breaking output change acceptable?
+    FEEDBACK: if they're no longer useful, don't keep them. Note: although the `specification/` files will be yaml -- use whatever files you'd prefer internally to manage state-tracking and other operational work.
+
+
 
 ## Recommended Initial Assumptions
 
