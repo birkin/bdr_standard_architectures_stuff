@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from lib.config import SCRIPT_VERSION
+from lib.config import SCRIPT_VERSION, SIGNATURE_ARCHITECTURE_VERSION
 from lib.models import CollectionRef
 from lib.utils import atomic_write_json, utc_now
 
@@ -21,8 +21,9 @@ def load_or_initialize_state(args: argparse.Namespace) -> dict[str, Any]:
             state = json.load(file_object)
         validate_state_compatibility(state, args)
         ensure_checked_state(state)
-        state.setdefault('parent_item_signature_hashes', {})
-        state.setdefault('common_architecture_candidates', {})
+        state.setdefault('parent_item_signature_results', {})
+        state.setdefault('dimension_signature_candidates', {})
+        state.setdefault('composite_architecture_candidates', {})
         state.setdefault('collection_summaries', [])
         state.setdefault('warnings', [])
     return state
@@ -35,6 +36,7 @@ def new_state(args: argparse.Namespace) -> dict[str, Any]:
     """
     state = {
         'script_version': SCRIPT_VERSION,
+        'signature_architecture_version': SIGNATURE_ARCHITECTURE_VERSION,
         'api_root': args.api_root,
         'parameters': material_parameters(args),
         'started_at': utc_now(),
@@ -42,9 +44,10 @@ def new_state(args: argparse.Namespace) -> dict[str, Any]:
         'collections_discovered': [],
         'selected_collections': [],
         'checked': {'collection_counts': [], 'collections': [], 'parent_items': []},
-        'parent_item_signature_hashes': {},
+        'parent_item_signature_results': {},
         'in_progress': {'collection_pid': '', 'parent_pid': ''},
-        'common_architecture_candidates': {},
+        'dimension_signature_candidates': {},
+        'composite_architecture_candidates': {},
         'collection_summaries': [],
         'warnings': [],
     }
@@ -59,6 +62,8 @@ def validate_state_compatibility(state: dict[str, Any], args: argparse.Namespace
     expected_parameters = material_parameters(args)
     if state.get('script_version') != SCRIPT_VERSION:
         raise ValueError('Saved state script_version does not match. Use --refresh-state to start over.')
+    if state.get('signature_architecture_version') != SIGNATURE_ARCHITECTURE_VERSION:
+        raise ValueError('Saved state signature architecture version does not match. Use --refresh-state to start over.')
     if state.get('api_root') != args.api_root:
         raise ValueError('Saved state api_root does not match. Use --refresh-state to start over.')
     if state.get('parameters') != expected_parameters:
@@ -83,6 +88,8 @@ def material_parameters(args: argparse.Namespace) -> dict[str, Any]:
     parameters = {
         'max_collections': args.max_collections,
         'max_items_per_collection': args.max_items_per_collection,
+        'max_children_per_parent': args.max_children_per_parent,
+        'signature_architecture_version': SIGNATURE_ARCHITECTURE_VERSION,
         'rows': args.rows,
         'include_private': args.include_private,
         'full_item_validation_sample': args.full_item_validation_sample,
@@ -90,8 +97,7 @@ def material_parameters(args: argparse.Namespace) -> dict[str, Any]:
         'collection_pids': args.collection_pids,
         'skip_collections': args.skip_collections,
         'min_consistency_percent': args.min_consistency_percent,
-        'include_mime_types': args.include_mime_types,
-        'fetch_all_children': args.fetch_all_children,
+        'fetch_all_children_max_1000': args.fetch_all_children_max_1000,
         'sample_strategy': args.sample_strategy,
         'random_seed': args.random_seed,
         'min_sample_size': args.min_sample_size,

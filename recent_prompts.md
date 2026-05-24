@@ -354,3 +354,19 @@ Main response:
 Updated `bdr_standard_architectures/plans/PLAN__implement_specific_signatures.md` to incorporate the marked feedback. Renamed the child-fetch flag to `--fetch-all-children-max-1000`, removed the planned `--include-mime-types` flag, reframed field access as BDR API / BDR Search API access, required structural validation tests for generated YAML if no schema validator is used, and clarified YAML merge preservation for label-like human-entered fields.
 
 ---
+
+Prompt:
+
+- Review `bdr_standard_architectures/AGENTS.md` for coding-directives.
+
+- Review `bdr_standard_architectures/plans/PLAN__implement_specific_signatures.md` for the plan to implement.
+
+- Proceed with implementation!
+
+Thx!
+
+Main response:
+
+Implemented the specific signature architecture. Added child sampling limits and `--fetch-all-children-max-1000`, removed `--include-mime-types`, added dimension/composite signature bundles, updated resumable state and reports, added YAML specification generation with merge behavior, added PyYAML, updated README and tests, and verified with `uv run ./run_tests.py`, `uv run ruff check .`, and `uv run ./main.py --help`.
+
+---

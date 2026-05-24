@@ -12,7 +12,7 @@ from lib.config import DEFAULT_USER_AGENT
 from lib.models import ArchitectureIndex
 from lib.report import build_result
 from lib.sampling import fetch_children, fetch_sampled_top_level_items
-from lib.signatures import build_item_signature, hash_signature
+from lib.signatures import build_signature_bundle
 from lib.state import (
     collection_to_dict,
     ensure_checked_state,
@@ -70,7 +70,7 @@ def run_sampler_with_client(args: argparse.Namespace, client: ApiClient, state: 
 
     architecture_index = ArchitectureIndex.from_state(state)
     collection_summaries = state.setdefault('collection_summaries', [])
-    parent_hashes = state.setdefault('parent_item_signature_hashes', {})
+    parent_results = state.setdefault('parent_item_signature_results', {})
 
     for collection in selected:
         if collection.pid in checked['collections']:
@@ -83,21 +83,28 @@ def run_sampler_with_client(args: argparse.Namespace, client: ApiClient, state: 
             parent_key = parent_check_key(collection.pid, parent_pid)
             state['in_progress'] = {'collection_pid': collection.pid, 'parent_pid': parent_pid}
             if parent_key in checked['parent_items']:
-                item_signature_hashes.append(parent_hashes[parent_key])
+                item_signature_hashes.append(parent_results[parent_key]['composite_signature_hash'])
                 continue
-            child_docs, children_truncated = fetch_children(client, parent_pid, args)
-            signature = build_item_signature(parent_doc, child_docs, args, children_truncated)
-            signature_hash = hash_signature(signature)
-            architecture_index.add(signature_hash, signature, collection, parent_doc)
-            state['common_architecture_candidates'] = architecture_index.candidates
+            child_result = fetch_children(client, parent_pid, args)
+            child_evidence = child_result.__dict__
+            bundle = build_signature_bundle(collection.pid, parent_doc, child_result.docs, child_evidence, len(parent_docs))
+            signature_hash = bundle['composite']['signature_hash']
+            architecture_index.add_bundle(bundle, collection, parent_doc)
+            state['dimension_signature_candidates'] = architecture_index.dimension_candidates
+            state['composite_architecture_candidates'] = architecture_index.composite_candidates
             item_signature_hashes.append(signature_hash)
-            parent_hashes[parent_key] = signature_hash
+            parent_results[parent_key] = {
+                'composite_signature_hash': signature_hash,
+                'dimension_hashes': bundle['composite']['component_hashes'],
+                'observation': bundle['observation'],
+            }
             checked['parent_items'].append(parent_key)
             save_state_if_enabled(args, state)
         summary = classify_collection(collection, item_signature_hashes, args)
         collection_summaries.append(summary)
         architecture_index.mark_collection_summary(summary)
-        state['common_architecture_candidates'] = architecture_index.candidates
+        state['dimension_signature_candidates'] = architecture_index.dimension_candidates
+        state['composite_architecture_candidates'] = architecture_index.composite_candidates
         checked['collections'].append(collection.pid)
         state['in_progress'] = {'collection_pid': '', 'parent_pid': ''}
         save_state_if_enabled(args, state)

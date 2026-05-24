@@ -16,7 +16,7 @@
 
 This project identifies common object architectures in the Brown Digital Repository (BDR).
 
-It samples BDR collections, looks at top-level objects and their direct children, normalizes each object's object type and datastream inventory, and groups repeated parent/child patterns into architecture candidates.
+It samples BDR collections, looks at top-level objects and their direct children, normalizes each object's object type and datastream inventory, and groups repeated dimension signatures into composite architecture candidates.
 
 The practical goal is to support future ingest planning: when an architecture is common in the BDR, it is more likely to be a pattern the repository already supports without custom development.
 
@@ -34,6 +34,7 @@ Small public-API smoke run:
 uv run ./main.py \
   --max-collections 1 \
   --max-items-per-collection 5 \
+  --max-children-per-parent 5 \
   --rows 5 \
   --sleep-seconds 1 \
   --output-json /tmp/bdr_architectures.json \
@@ -50,6 +51,7 @@ The default run writes:
 
 - `../bdr_standard_architectures_output/common_architectures.json`
 - `../bdr_standard_architectures_output/common_architectures.md`
+- YAML specification files in `specifications/`
 - `../bdr_standard_architectures_output/architecture_cache/run_state.json`
 - cached API responses in `../bdr_standard_architectures_output/architecture_cache/`
 
@@ -70,10 +72,12 @@ uv run ./main.py \
   --api-root https://repository.library.brown.edu/api/ \
   --max-collections 20 \
   --max-items-per-collection 100 \
+  --max-children-per-parent 100 \
   --rows 100 \
-  --sleep-seconds 0.5 \
+  --sleep-seconds 2.0 \
   --output-json ../bdr_standard_architectures_output/common_architectures.json \
   --output-md ../bdr_standard_architectures_output/common_architectures.md \
+  --output-specifications-dir specifications \
   --cache-dir ../bdr_standard_architectures_output/architecture_cache \
   --state-file ../bdr_standard_architectures_output/architecture_cache/run_state.json \
   --full-item-validation-sample 0 \
@@ -94,8 +98,7 @@ The boolean flags are false when omitted. The default run does not set:
 - `--no-resume`
 - `--include-private`
 - `--include-singletons`
-- `--include-mime-types`
-- `--fetch-all-children`
+- `--fetch-all-children-max-1000`
 
 This section is intentionally separate from Usage so the normal commands stay easy to scan.
 
@@ -256,7 +259,9 @@ What it does:
 - Searches for `rel_is_part_of_ssim:"<parent-pid>"`.
 - Retrieves child object type, datastreams, pagination, relationship hints, and display label.
 - Sorts paginated children naturally before unordered children.
-- Marks children as truncated if a parent has more than one page of children and `--fetch-all-children` is not set.
+- Fetches at most `--max-children-per-parent` children by default.
+- Marks children as truncated if the API reports more children than the run observed.
+- `--fetch-all-children-max-1000` raises the child-fetch ceiling to 1,000 direct children per parent.
 
 Why that is useful:
 
@@ -264,34 +269,33 @@ Why that is useful:
 - Natural child sorting makes page-like objects behave consistently.
 - Truncation prevents the report from presenting incomplete child data as complete.
 
-### 8. Build Architecture Signatures
+### 8. Build Signature Bundles
 
-`lib.signatures.build_item_signature()` normalizes one sampled parent and its children.
+`lib.signatures.build_signature_bundle()` normalizes one sampled parent and its children into dimension and composite signatures.
 
 What it does:
 
-- Records parent object type.
-- Parses parent `datastreams_ssi`.
-- Groups children by object type, display label, and datastream set.
-- Uses child count buckets: `none`, `one`, `few:2-9`, `many:10+`.
-- Hashes the deterministic signature JSON into a short signature hash.
+- Builds parent relationship, object definition, children, open access, visibility, and auxiliary relationship signatures.
+- Builds a composite architecture signature from the component signature hashes.
+- Keeps sampling/truncation evidence in observation metadata rather than signature identity.
+- Hashes deterministic signature JSON into short signature hashes.
 
 Why that is useful:
 
 - Signatures ignore unstable values like PIDs and titles.
-- Count buckets keep a 20-page and 200-page book-like object in the same architecture family.
+- Child counts and truncation evidence support review without defining architecture identity.
 - Hashes make repeated architecture patterns easy to count and compare.
 
 ### 9. Accumulate Candidates And Checkpoint Progress
 
-`lib.models.ArchitectureIndex` tracks architecture candidates, examples, and collection counts.
+`lib.models.ArchitectureIndex` tracks composite architecture candidates, dimension signature candidates, examples, and collection counts.
 
 What it does:
 
 - Adds each sampled item to a signature bucket.
 - Stores representative example items and collections.
 - Saves checked parent items using a collection PID plus parent PID key.
-- Saves populated architecture candidates in the state file.
+- Saves populated composite and dimension candidates in the state file.
 
 Why that is useful:
 
@@ -317,18 +321,19 @@ Why that is useful:
 
 ### 11. Write Reports
 
-`lib.report.build_result()` builds JSON output, and `lib.report.render_markdown_report()` builds Markdown output.
+`lib.report.build_result()` builds JSON output, `lib.report.render_markdown_report()` builds Markdown output, and `lib.specifications.write_specification_files()` writes YAML specification files.
 
 What it does:
 
-- Sorts architecture candidates by dominance and sampled item count.
+- Sorts composite architecture candidates by dominance and sampled item count.
 - Applies report filters such as `--top-architectures` and `--include-singletons`.
-- Writes machine-readable JSON and human-readable Markdown.
+- Writes machine-readable JSON, human-readable Markdown, and specification YAML files.
 
 Why that is useful:
 
 - JSON supports downstream processing.
 - Markdown supports human review with BDR maintainers and ingest planners.
+- YAML specifications are the core reusable output for building up architecture knowledge over time.
 
 ## Argument Reference
 
@@ -349,7 +354,7 @@ Why that is useful:
 
 #### `--sleep-seconds`
 
-Default: `0.5`
+Default: `2.0`
 
 What it does:
 
@@ -398,6 +403,20 @@ What it does:
 Why that is useful:
 
 - Markdown is easier for people to review, share, and turn into ingest guidance.
+
+#### `--output-specifications-dir`
+
+Default: `specifications`
+
+What it does:
+
+- Sets the directory where generated YAML specification files are written.
+- Existing compatible specification files are merged by deterministic signature hash.
+
+Why that is useful:
+
+- Specification YAML files are the core reusable output of the tool.
+- Deterministic hashes allow repeated runs to enrich existing entries without creating new random identifiers.
 
 ### Cache And Resume State
 
@@ -579,32 +598,36 @@ Why that is useful:
 
 ### Child Fetching And Signature Detail
 
-#### `--fetch-all-children`
+#### `--max-children-per-parent`
+
+Default: `100`
+
+What it does:
+
+- Sets how many direct child objects are examined per sampled parent by default.
+- The value must be between `1` and `1000`.
+
+Why that is useful:
+
+- Keeps default scans bounded while still inspecting enough child objects to detect common child definitions.
+
+#### `--fetch-all-children-max-1000`
 
 Default: false
 
 What it does:
 
-- Fetches all child pages when a sampled parent has more than 500 direct children.
-- Without it, the script records the signature as truncated.
+- Fetches direct children up to the hard 1,000-child safety cap.
+- Without it, the script observes at most `--max-children-per-parent` children per sampled parent.
+- If the API reports more children than were observed, child evidence is marked as truncated.
 
 Why that is useful:
 
 - Default truncation is safer and cheaper for very large objects.
-- Fetching all children is useful when exact child-group composition matters for a smaller targeted scan.
+- Fetching up to 1,000 children is useful for smaller targeted scans where child variation matters.
+- The flag name makes the safety ceiling explicit.
 
-#### `--include-mime-types`
-
-Default: false
-
-What it does:
-
-- Includes MIME type in datastream tokens when available, for example `JP2:image/jp2`.
-
-Why that is useful:
-
-- Leaving MIME types out groups objects by datastream ID, which is usually the architecture-level concern.
-- Including MIME types is useful for diagnosing variation inside otherwise similar architectures.
+MIME details are included in object-definition signatures by default; there is no separate MIME flag.
 
 ### Collection Classification
 
@@ -683,8 +706,11 @@ The JSON report contains:
 - API root
 - material parameters
 - collection summaries
-- architecture candidates
+- composite architecture candidates
+- dimension signatures
+- child sampling summary
 - warnings
+- specification-ready structures
 
 Use this when you need complete structured data.
 
@@ -694,6 +720,8 @@ The Markdown report contains:
 
 - summary counts
 - most common architecture sections
+- component dimension hashes
+- child sampling/truncation evidence
 - representative collections and items
 - collections with mixed architectures
 
@@ -708,8 +736,9 @@ The state file contains:
 - checked collection counts
 - checked collections
 - checked parent items
-- parent item signature hashes
-- populated architecture candidates
+- parent item signature results
+- populated dimension signature candidates
+- populated composite architecture candidates
 - collection summaries
 
 Use this to resume interrupted scans. The script validates state compatibility against the current API root, script version, and material parameters before resuming.
@@ -732,6 +761,7 @@ The main code paths are:
 - `lib/collections.py`: collection discovery and counting.
 - `lib/sampling.py`: top-level item and child fetching.
 - `lib/signatures.py`: architecture signature construction.
+- `lib/specifications.py`: specification YAML generation and merge behavior.
 - `lib/classification.py`: collection consistency classification.
 - `lib/models.py`: collection and architecture index models.
 - `lib/report.py`: JSON result assembly and Markdown rendering.

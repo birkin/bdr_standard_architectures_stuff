@@ -7,16 +7,19 @@ from pathlib import Path
 from lib.classification import classify_collection
 from lib.config import (
     DEFAULT_CACHE_DIR,
+    DEFAULT_MAX_CHILDREN_PER_PARENT,
     DEFAULT_OUTPUT_JSON,
     DEFAULT_OUTPUT_MD,
     DEFAULT_OUTPUT_ROOT,
+    DEFAULT_SLEEP_SECONDS,
     DEFAULT_STATE_FILE,
     PROJECT_ROOT,
 )
 from lib.models import ArchitectureIndex, CollectionRef
 from lib.report import render_markdown_report
-from lib.sampling import child_sort_key
-from lib.signatures import build_item_signature, hash_signature, parse_datastreams
+from lib.sampling import child_sort_key, fetch_children
+from lib.signatures import build_item_signature, build_signature_bundle, hash_signature, parse_datastreams
+from lib.specifications import build_specification_documents, merge_signature_entry, validate_specification_document
 from lib.state import load_or_initialize_state, save_state_if_enabled
 from lib.utils import evenly_spaced_offsets, natural_sort_key
 
@@ -30,8 +33,9 @@ def build_args(**overrides: object) -> argparse.Namespace:
         'api_root': 'https://repository.library.brown.edu/api/',
         'max_collections': 20,
         'max_items_per_collection': 100,
+        'max_children_per_parent': DEFAULT_MAX_CHILDREN_PER_PARENT,
         'rows': 100,
-        'sleep_seconds': 0.5,
+        'sleep_seconds': DEFAULT_SLEEP_SECONDS,
         'output_json': DEFAULT_OUTPUT_JSON,
         'output_md': DEFAULT_OUTPUT_MD,
         'cache_dir': DEFAULT_CACHE_DIR,
@@ -47,8 +51,7 @@ def build_args(**overrides: object) -> argparse.Namespace:
         'min_consistency_percent': 90.0,
         'top_architectures': 25,
         'include_singletons': False,
-        'include_mime_types': False,
-        'fetch_all_children': False,
+        'fetch_all_children_max_1000': False,
         'sample_strategy': 'first',
         'random_seed': 0,
         'min_sample_size': 10,
@@ -56,6 +59,17 @@ def build_args(**overrides: object) -> argparse.Namespace:
     defaults.update(overrides)
     args = argparse.Namespace(**defaults)
     return args
+
+
+class FakeSearchClient:
+    def __init__(self, pages: list[dict[str, object]]) -> None:
+        self.pages = pages
+        self.requests: list[dict[str, object]] = []
+
+    def search(self, params: dict[str, object]) -> dict[str, object]:
+        self.requests.append(params)
+        page = self.pages[len(self.requests) - 1]
+        return page
 
 
 class TestMain(unittest.TestCase):
@@ -122,6 +136,44 @@ class TestMain(unittest.TestCase):
         self.assertEqual('few:2-9', signature['child_count_bucket'])
         self.assertEqual(2, len(signature['child_groups']))
         self.assertEqual('few:2-9', signature['child_groups'][0]['count_bucket'])
+        self.assertNotIn('children_truncated', signature)
+
+    def test_build_signature_bundle_uses_dimension_hashes_for_composite(self) -> None:
+        """
+        Checks that composite signatures are built from dimension hashes.
+        """
+        parent_doc = {
+            'pid': 'bdr:parent',
+            'object_type': 'implicit-set',
+            'datastreams_ssi': json.dumps({'MODS': {'mimeType': 'text/xml'}}),
+        }
+        child_docs = [
+            {
+                'pid': 'bdr:c1',
+                'object_type': 'image',
+                'datastreams_ssi': json.dumps({'JP2': {'mimeType': 'image/jp2'}, 'MODS': {}}),
+                'rel_has_pagination_ssim': ['1'],
+            }
+        ]
+        child_evidence = {
+            'total_found': 1,
+            'observed_count': 1,
+            'sample_limit': 100,
+            'hard_limit': 1000,
+            'truncated': False,
+            'fetch_all_children_max_1000': False,
+            'fetch_strategy': 'first_by_pid_then_bdr_child_sort',
+        }
+
+        bundle = build_signature_bundle('bdr:collection', parent_doc, child_docs, child_evidence, 1)
+
+        component_hashes = bundle['composite']['component_hashes']
+        self.assertIn('children', component_hashes)
+        self.assertEqual(
+            [bundle['dimensions']['child_object_definitions'][0]['signature_hash']],
+            bundle['dimensions']['children']['signature']['object_definition_hashes'],
+        )
+        self.assertFalse(bundle['observation']['children_truncated'])
 
     def test_hash_signature_is_stable_for_key_order(self) -> None:
         """
@@ -149,6 +201,47 @@ class TestMain(unittest.TestCase):
 
         self.assertEqual(['bdr:1', 'bdr:2', 'bdr:3'], [doc['pid'] for doc in sorted_docs])
         self.assertEqual(['page', 12], natural_sort_key('page12'))
+
+    def test_fetch_children_truncates_at_sample_limit(self) -> None:
+        """
+        Checks that child fetching records truncation when the sample cap is hit.
+        """
+        args = build_args(max_children_per_parent=2)
+        client = FakeSearchClient(
+            [
+                {
+                    'response': {
+                        'numFound': 3,
+                        'docs': [{'pid': 'bdr:2'}, {'pid': 'bdr:1'}],
+                    }
+                }
+            ]
+        )
+
+        result = fetch_children(client, 'bdr:parent', args)
+
+        self.assertEqual(2, result.observed_count)
+        self.assertEqual(3, result.total_found)
+        self.assertTrue(result.truncated)
+        self.assertEqual(2, client.requests[0]['rows'])
+
+    def test_fetch_children_max_1000_paginates_until_complete(self) -> None:
+        """
+        Checks that max-1000 child fetching paginates until all observed children are fetched.
+        """
+        args = build_args(fetch_all_children_max_1000=True)
+        client = FakeSearchClient(
+            [
+                {'response': {'numFound': 501, 'docs': [{'pid': f'bdr:{index}'} for index in range(500)]}},
+                {'response': {'numFound': 501, 'docs': [{'pid': 'bdr:501'}]}},
+            ]
+        )
+
+        result = fetch_children(client, 'bdr:parent', args)
+
+        self.assertEqual(501, result.observed_count)
+        self.assertFalse(result.truncated)
+        self.assertEqual([500, 500], [request['rows'] for request in client.requests])
 
     def test_classify_collection_marks_mostly_uniform(self) -> None:
         """
@@ -180,13 +273,13 @@ class TestMain(unittest.TestCase):
             args = build_args(state_file=str(state_file))
             state = load_or_initialize_state(args)
             state['checked']['collections'].append('bdr:collection')
-            state['common_architecture_candidates']['abc123'] = {'signature_hash': 'abc123'}
+            state['composite_architecture_candidates']['abc123'] = {'signature_hash': 'abc123'}
             save_state_if_enabled(args, state)
 
             loaded = load_or_initialize_state(args)
 
         self.assertEqual(['bdr:collection'], loaded['checked']['collections'])
-        self.assertEqual({'signature_hash': 'abc123'}, loaded['common_architecture_candidates']['abc123'])
+        self.assertEqual({'signature_hash': 'abc123'}, loaded['composite_architecture_candidates']['abc123'])
 
     def test_state_parameter_mismatch_raises(self) -> None:
         """
@@ -233,7 +326,7 @@ class TestMain(unittest.TestCase):
                     'dominant_signature_percent': 0.7,
                 }
             ],
-            'architectures': list(index.candidates.values()),
+            'composite_architectures': list(index.candidates.values()),
         }
 
         markdown = render_markdown_report(result)
@@ -241,6 +334,59 @@ class TestMain(unittest.TestCase):
         self.assertIn('implicit-set with image children', markdown)
         self.assertIn('Collections With Mixed Architectures', markdown)
         self.assertIn('`bdr:collection`', markdown)
+
+    def test_specification_documents_have_expected_structure(self) -> None:
+        """
+        Checks that specification documents are structurally valid.
+        """
+        result = {
+            'api_root': 'https://repository.library.brown.edu/api/',
+            'dimension_signatures': {
+                'visibility': {
+                    'abc123': {
+                        'signature_hash': 'abc123',
+                        'label': 'public api observed',
+                        'description': 'Observed through public API.',
+                        'exemplar_pids': ['bdr:1'],
+                        'observed_count': 1,
+                        'signature': {'visibility_scope': 'public_api_observed'},
+                    }
+                }
+            },
+            'composite_architectures': [],
+        }
+
+        documents = build_specification_documents(result)
+
+        validate_specification_document(documents['visibility'])
+        self.assertIn('public_api_observed', documents['visibility']['signatures']['public_api_observed_abc123']['signature'].values())
+
+    def test_merge_signature_entry_preserves_label_like_fields(self) -> None:
+        """
+        Checks that YAML merge behavior preserves human review labels.
+        """
+        existing = {
+            'signature_hash': 'abc123',
+            'label': 'Reviewed label',
+            'description': 'Reviewed description',
+            'exemplar_pids': ['bdr:old'],
+            'observed_count': 1,
+            'signature': {'a': 1},
+        }
+        new = {
+            'signature_hash': 'abc123',
+            'label': 'Generated label',
+            'description': 'Generated description',
+            'exemplar_pids': ['bdr:new'],
+            'observed_count': 2,
+            'signature': {'a': 1},
+        }
+
+        merged = merge_signature_entry(existing, new)
+
+        self.assertEqual('Reviewed label', merged['label'])
+        self.assertEqual('Reviewed description', merged['description'])
+        self.assertEqual(['bdr:old', 'bdr:new'], merged['exemplar_pids'])
 
 
 if __name__ == '__main__':
