@@ -340,13 +340,21 @@ The review should capture both matches and mismatches. Mismatches may be more in
 ## Open Questions
 
 - Should datastream signatures distinguish required, optional, and derivative datastreams, or should they initially use only observed datastream IDs?
+    - FEEDBACK: for now, only observed datastream IDs.
 - Should MIME type be part of datastream signatures, or a variation reported outside the signature?
+    - FEEDBACK: if we have it, let's include it.
 - Should exact child counts ever matter, or should count buckets always define architecture identity?
+    - FEEDBCK: ignore exact counts; not relevant.
 - Should child ordering be part of the parent relationship signature, the child profile signature, or both?
+    - FEEDBACK: let's say both.
 - Should visibility remain out of the composite signature until non-public API data is available?
+    - FEEDBACK: see my context notes elsewere for very limited "public" usage in the signature.
 - Should auxiliary relationships such as transcripts, translations, annotations, derivations, and versions become first-class dimensions?
+    - FEEDBACK: answered in my context notes.
 - Should a composite signature be a strict combination of dimension signature IDs, or should it allow overrides and local refinements?
+    - FEEDBACK: for now -- let's say strict combination for now -- in the spirit of documenting what exists.
 - Should human-readable descriptions describe observed BDR behavior, recommended ingest patterns, or both?
+    - FEEDBACK: for now, observed BDR behavior -- but there will be additional human-entered context indicating "standard"/"deprecated" content.
 
 ## Proposed Next Step
 
