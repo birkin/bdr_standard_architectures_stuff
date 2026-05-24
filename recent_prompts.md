@@ -175,3 +175,76 @@ Main response:
 - Updated the proposed next step to refer only to multiple flat YAML files.
 
 ---
+
+Plan feedback:
+
+- remove "object_type" from the parent-child relationship section.
+
+- rename `object_datastream_signatures.yaml` to something like `object_definition_signatures.yaml` because I'd like to include `object_type` and also `typeOfResource` when available.
+
+Main response:
+
+- Updated `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md`.
+- Removed `parent_object_type` from the parent relationship signature section.
+- Renamed the object datastream signature concept/file to `object_definition_signatures.yaml`.
+- Added `typeOfResource` as an object definition field when available.
+- Updated YAML examples and composite signature references to use object-definition terminology.
+- Verified that no stale `object_datastream`, `parent_object_type`, or `parent_datastream_signature` references remain.
+
+---
+
+Plan feedback:
+
+- remove `### 3. Child Profile Signature` , and any references -- we'll not currently focus on the children as a group.
+
+Main response:
+
+- Updated `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md`.
+- Removed the `Child Profile Signature` section.
+- Removed `child_profile_signatures.yaml` from the specification file list.
+- Removed child-profile references from YAML examples, composite signatures, initial signature lists, and answered questions.
+- Verified no child-profile references remain.
+
+---
+
+Plan feedback:
+
+- Add to `### 2. Object Definition Signature`:
+	- 'has_parent', 'has_children', 'is_ordered'
+
+- Remove `### 5. Presentation Or Navigation Signature` for now -- i'm hoping streaming can be detected other ways.
+
+Main response:
+
+- Updated `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md`.
+- Added `has_parent`, `has_children`, and `is_ordered` to Object Definition Signature.
+- Updated object-definition YAML examples with the new fields.
+- Removed the Presentation Or Navigation Signature section.
+- Updated the video-streaming open question to avoid presentation/navigation terminology.
+- Verified no presentation/navigation terms remain.
+
+---
+
+Plan feedback:
+
+- Provide an example yaml-file for each of these:
+	- `specifications/parent_relationship_signatures.yaml`
+	- `specifications/object_definition_signatures.yaml`
+	- `specifications/open_access_signatures.yaml`
+	- `specifications/visibility_signatures.yaml`
+	- `specifications/auxiliary_relationships_signatures.yaml`
+	- `specifications/composite_architecture_signatures.yaml`
+- Add hash-based identifier signatures to each individual signature file.
+- Add a placeholder for three BDR PIDs that can be exemplars.
+- Note that composite signatures may be hashes of component hashes with human descriptive narrative.
+
+Main response:
+
+- Updated `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md`.
+- Added YAML examples for all six decided specification files.
+- Added `signature_hash` placeholders to individual and composite signature examples.
+- Added `exemplar_pids` placeholders with three BDR PID slots per signature.
+- Added composite signature examples using component signature IDs and component `signature_hash` values.
+- Added guidance that composite hashes can be calculated from component hashes while descriptions, narratives, and exemplars support human review.
+
+---
