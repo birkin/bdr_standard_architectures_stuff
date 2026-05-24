@@ -342,3 +342,15 @@ Main response:
 Updated `bdr_standard_architectures/plans/PLAN__implement_specific_signatures.md` to incorporate the marked feedback and recent direct plan changes. Added `children_signatures.yaml`, made specification YAML generation a core normal output, added the 1,000-child safety cap for `--fetch-all-children`, resolved known Solr/API field names, made MIME details part of object-definition identity by default, removed stale opt-in/feedback question language, and kept a short open-decisions section for implementation-time choices.
 
 ---
+
+Prompt:
+
+- I've updated the plan with "FEEDBACK" (all caps). Update the plan accordingly.
+
+- rename `fetch-all-children` to something like `fetch-all-children-max-1000` to clarify the behavior
+
+Main response:
+
+Updated `bdr_standard_architectures/plans/PLAN__implement_specific_signatures.md` to incorporate the marked feedback. Renamed the child-fetch flag to `--fetch-all-children-max-1000`, removed the planned `--include-mime-types` flag, reframed field access as BDR API / BDR Search API access, required structural validation tests for generated YAML if no schema validator is used, and clarified YAML merge preservation for label-like human-entered fields.
+
+---

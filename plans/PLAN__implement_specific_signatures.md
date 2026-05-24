@@ -57,9 +57,9 @@ Important implementation correction: the current coarse signature includes `chil
 - Default API pacing should change from `--sleep-seconds 0.5` to `--sleep-seconds 2.0` because the new work may inspect more child objects and therefore create more server load.
 - Keep the current default of `--max-items-per-collection 100`; this remains the default parent-item sample size per selected collection.
 - Add a new child-object sample cap, tentatively named `--max-children-per-parent`, defaulting to `100`.
-- Keep `--fetch-all-children`, but reinterpret it carefully:
-  - without `--fetch-all-children`, fetch at most `--max-children-per-parent` children per sampled parent and mark child evidence as truncated or sampled when more children exist;
-  - with `--fetch-all-children`, fetch all direct children up to a hard safety cap of 1,000 children per parent.
+- Keep `--fetch-all-children-max-1000`, but reinterpret it carefully:
+  - without `--fetch-all-children-max-1000`, fetch at most `--max-children-per-parent` children per sampled parent and mark child evidence as truncated or sampled when more children exist;
+  - with `--fetch-all-children-max-1000`, fetch all direct children up to a hard safety cap of 1,000 children per parent.
 - Do not include child truncation/sample metadata in signature hashes. Include it in observation metadata, state, JSON output, and Markdown warnings/notes.
 - Keep API response caching in `lib.cache.Cache` and `lib.api.ApiClient` unchanged unless a cache-key version bump is needed for materially different request parameters.
 - Keep the existing sampler workflow and state checkpointing, but change the data stored for each parent from one `signature_hash` to a richer observation/signature result.
@@ -114,7 +114,7 @@ It should include scan/evidence metadata that helps evaluate confidence but usua
 - number of children observed for the parent;
 - total child count reported by the API if known;
 - whether child evidence was capped by `--max-children-per-parent`;
-- whether child evidence was capped only because `--fetch-all-children` was not set;
+- whether child evidence was capped only because `--fetch-all-children-max-1000` was not set;
 - public API visibility scope;
 - fields used for detection.
 
@@ -197,29 +197,29 @@ Add a child sampling limit while preserving current behavior where possible.
 
 - Add `--max-children-per-parent`, type `int`, default `100`.
 - Treat this as the default number of child objects examined per parent item.
-- Use this cap only when `--fetch-all-children` is false.
+- Use this cap only when `--fetch-all-children-max-1000` is false.
 
 ### Fetch behavior
 
 Change `lib.sampling.fetch_children()` so it can return both docs and evidence metadata:
 
 - child docs observed;
-- `num_found` or equivalent total direct-child count from Solr;
+- `num_found` or equivalent total direct-child count from the BDR Search API response;
 - `children_truncated` or `children_sampled` boolean;
 - `child_sample_limit` value;
 - maybe `child_fetch_strategy`, initially `first` by stable sort.
 
 The current code fetches child rows with `rows = 500` and returns `(docs, truncated)`. Replace that tuple with a small dataclass so callers cannot mix up booleans and counts.
 
-With the new default, request `rows = normalized_rows(args.max_children_per_parent)` when not fetching all children. If `--fetch-all-children` is set, keep paginating with a safe page size such as `500`, but stop at 1,000 observed children per parent and mark the result as truncated when the API reports more than 1,000 direct children.
+With the new default, request `rows = normalized_rows(args.max_children_per_parent)` when not fetching all children. If `--fetch-all-children-max-1000` is set, keep paginating with a safe page size such as `500`, but stop at 1,000 observed children per parent and mark the result as truncated when the API reports more than 1,000 direct children.
 
-Use the Solr `numFound` value to set truncation:
+Use the BDR Search API `numFound` value to set truncation:
 
 - `total_found > observed_count` means `children_truncated: true`;
 - `total_found <= observed_count` means `children_truncated: false`;
-- if `--fetch-all-children` is true and all pages completed, `children_truncated: false`.
+- if `--fetch-all-children-max-1000` is true and all pages completed, `children_truncated: false`.
 
-Validate `--max-children-per-parent` as a positive integer. When `--fetch-all-children` is not set, the value must not exceed 1,000. When `--fetch-all-children` is set, the effective max is always 1,000; update help text so users understand that the flag means "fetch up to the 1,000-child safety cap."
+Validate `--max-children-per-parent` as a positive integer. When `--fetch-all-children-max-1000` is not set, the value must not exceed 1,000. When `--fetch-all-children-max-1000` is set, the effective max is always 1,000; update help text so users understand that the flag means "fetch up to the 1,000-child safety cap."
 
 ### Ordering
 
@@ -259,7 +259,7 @@ Current child search fields include:
 - `rel_is_translation_of_ssim`
 - `rel_display_label_ssi`
 
-Use these known public/Solr fields where available:
+Use these known BDR API / BDR Search API indexed fields where available:
 
 - `mods_type_of_resource` for `typeOfResource`;
 - rights/access-control fields from rightsMetadata where publicly returned, including `*_access_*_ssim`, `_display_public_bsi`, `_display_brown_bsi`, and `_display_private_bsi`;
@@ -294,7 +294,8 @@ Update `parse_args()`:
 - add `--max-children-per-parent`, type `int`, default `100`;
 - add `--output-specifications-dir`, defaulting to `specifications`;
 - do not add a `--write-specifications` flag. Specification YAML files are a core output of this tool and should be written by default;
-- update `--fetch-all-children` help text to explain that it fetches direct children up to the 1,000-child safety cap;
+- add `--fetch-all-children-max-1000`, `store_true`, replacing the old `--fetch-all-children` flag;
+- remove `--include-mime-types`; MIME details are part of object-definition identity by default;
 - preserve existing flags unless there is a strong reason to rename one.
 
 Also update README's expanded default command and `tests/test.py::build_args()` after these argument changes.
@@ -320,7 +321,7 @@ Add a return object or dataclass for child fetch results, for example `ChildFetc
 - `truncated: bool`
 - `sample_limit: int`
 - `hard_limit: int`
-- `fetch_all_children: bool`
+- `fetch_all_children_max_1000: bool`
 - `fetch_strategy: str`
 
 Then update callers to use the new structure.
@@ -354,7 +355,7 @@ SignatureBundle
     child_observed_count
     child_sample_limit
     children_truncated
-    fetch_all_children
+    fetch_all_children_max_1000
     visibility_scope
   dimensions:
     parent_relationship
@@ -377,7 +378,7 @@ Preserve existing helper behavior where possible:
 - `hash_signature()` remains the canonical deterministic hash helper.
 - `parse_datastreams()` can stay as a token helper, but add a separate helper if structured datastream details are needed.
 - `count_bucket()` remains useful for reporting child evidence, but exact counts and count buckets should remain evidence/report metadata unless explicitly chosen as identity later.
-- MIME details should be included in object-definition identity by default. The current `--include-mime-types` flag can either be removed, retained as a compatibility no-op, or renamed only if there is a clear need to suppress MIME details.
+- MIME details should be included in object-definition identity by default. Remove the current `--include-mime-types` flag.
 
 ### `lib/models.py`
 
@@ -419,7 +420,7 @@ Keep the orchestration pattern.
 For each selected collection:
 
 1. Fetch sampled top-level parent docs.
-2. For each parent doc, fetch up to `--max-children-per-parent` child docs unless `--fetch-all-children` is set.
+2. For each parent doc, fetch up to `--max-children-per-parent` child docs unless `--fetch-all-children-max-1000` is set.
 3. Build a signature bundle.
 4. Add dimension signatures and composite signature to the index.
 5. Save parent-level signature result in state.
@@ -529,6 +530,7 @@ Dependency decision:
 - The project currently does not list a YAML package in `pyproject.toml`.
 - Add a YAML dependency rather than hand-writing YAML. `PyYAML` is acceptable; a package that also supports schema validation is also acceptable if it stays simple.
 - Validate the generated data structures in tests before writing YAML.
+- If the implementation does not use a YAML schema-validation package, add focused unittest coverage that performs structural validation of the generated specification YAML files.
 
 ## Specification File Semantics
 
@@ -580,8 +582,10 @@ Generated specification files should be treated as durable, build-out-over-time 
 - keep existing entries keyed by deterministic `signature_hash`;
 - add new entries for previously unseen hashes;
 - enrich existing entries with new exemplar PIDs or observed counts where appropriate;
-- preserve any human-entered description/status fields when possible;
+- preserve human-entered fields that function as labels or label-like review text;
 - avoid duplicating entries with the same hash.
+
+At the top of each generated YAML file, write a comment explaining merge behavior: assuming the API root and signature architecture version are compatible, deterministic/generated fields may be refreshed, but label-like human review fields are preserved.
 
 Operational state can remain JSON or another internal format. Only the specification files need to be YAML.
 
@@ -612,15 +616,16 @@ Add or update tests for:
 - deterministic hashing excludes descriptions/examples and includes only signature identity fields;
 - parent relationship signature detects no children, unordered children, and ordered children;
 - object definition signature normalizes datastream IDs and optional MIME details;
-- child sampling returns `truncated` when total children exceed `--max-children-per-parent` and `--fetch-all-children` is false;
-- child sampling with `--fetch-all-children` fetches through all pages up to the 1,000-child safety cap;
+- child sampling returns `truncated` when total children exceed `--max-children-per-parent` and `--fetch-all-children-max-1000` is false;
+- child sampling with `--fetch-all-children-max-1000` fetches through all pages up to the 1,000-child safety cap;
 - composite signatures are stable combinations of component hashes;
 - collection classification still works using composite hashes;
 - state compatibility rejects old coarse-signature state or mismatched child sampling settings;
 - Markdown report clearly shows component signatures and child evidence limits;
 - YAML specification output has the expected top-level structure.
+- YAML specification output passes structural validation tests, or schema validation if a schema-capable package is selected.
 - YAML specification output merges with existing same-API/same-version entries without duplicating deterministic hashes.
-- `--fetch-all-children` stops at the 1,000-child safety cap and marks truncation when more children exist.
+- `--fetch-all-children-max-1000` stops at the 1,000-child safety cap and marks truncation when more children exist.
 
 ## Implementation Sequence
 
@@ -729,16 +734,13 @@ uv run ./main.py \
   - Mitigate descriptions that say they document observed behavior, plus optional human-entered status fields in later work.
 - Child sampling may hide variation among later children.
   - Mitigate by recording `total_found`, observed count, sample limit, and truncation status in observation metadata and reports.
-- Merging generated YAML with existing curated entries could accidentally overwrite human notes.
-  - Mitigate by preserving existing human-entered fields and only updating deterministic/generated fields for matching hashes.
+- Merging generated YAML with existing curated entries could accidentally overwrite human labels or review text.
+  - Mitigate by preserving label-like human-entered fields, only updating deterministic/generated fields for matching hashes, and writing a top-of-file YAML comment that describes the merge policy.
 
 ## Open Decisions For Implementation Session
 
-- Whether to use `PyYAML` plus structural validation tests, or a YAML package that includes schema validation.
-- Whether existing `--include-mime-types` should be removed, retained as a compatibility no-op, or changed into a different advanced flag.
-- Whether item API calls are worth adding for richer `relations.hasAnnotation` evidence, or whether the first implementation should rely only on Search API fields.
-- Which existing human-entered fields in YAML files must be preserved during merge beyond description/status/narrative notes.
-
+- Whether to use `PyYAML` plus structural validation tests, or a YAML package that includes schema validation. Either is acceptable, but structural validation must be covered by tests.
+- Whether richer annotation evidence should use only the existing BDR Search API responses or also call BDR item API endpoints such as `relations.hasAnnotation`.
 
 ## Questions / Decision Points For Birkin
 
