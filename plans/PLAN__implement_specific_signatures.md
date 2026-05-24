@@ -1,5 +1,26 @@
 # Plan: implement specific signature architecture
 
+## Table Of Contents
+
+- [Purpose](#purpose)
+- [Key Behavioral Changes](#key-behavioral-changes)
+- [Current Implementation Context](#current-implementation-context)
+- [Coding Directives To Preserve](#coding-directives-to-preserve)
+- [Target Signature Model](#target-signature-model)
+- [Child Object Sampling Strategy](#child-object-sampling-strategy)
+- [API Fields To Review And Possibly Expand](#api-fields-to-review-and-possibly-expand)
+- [Proposed Module Changes](#proposed-module-changes)
+- [Specification File Semantics](#specification-file-semantics)
+- [Output And CLI Design Options](#output-and-cli-design-options)
+- [State And Cache Compatibility](#state-and-cache-compatibility)
+- [Testing Plan](#testing-plan)
+- [Implementation Sequence](#implementation-sequence)
+- [Suggested Smoke Commands After Implementation](#suggested-smoke-commands-after-implementation)
+- [Risks And Mitigations](#risks-and-mitigations)
+- [Open Decisions For Implementation Session](#open-decisions-for-implementation-session)
+- [Questions / Decision Points For Birkin](#questions--decision-points-for-birkin)
+- [Recommended Initial Assumptions](#recommended-initial-assumptions)
+
 ## Purpose
 
 Update the current BDR architecture sampler so it captures smaller, named, human-readable signature dimensions and composes them into composite architecture signatures.

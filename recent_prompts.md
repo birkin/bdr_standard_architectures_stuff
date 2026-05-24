@@ -320,3 +320,13 @@ Main response:
 Reviewed the source prompt, existing implementation plan, `PLAN__consider_specific_signatures.md`, `README.md`, `AGENTS.md`, and relevant current modules. Updated `plans/PLAN__implement_specific_signatures.md` with implementation-focused clarifications around child sampling metadata, signature identity boundaries, child object profile structure, concrete state keys, report output names, test targets, and a Questions / Decision Points section for Birkin.
 
 ---
+
+Prompt:
+
+add table-of-contents/index links near the top of `bdr_standard_architectures/plans/PLAN__implement_specific_signatures.md` for top-level headings only.
+
+Main response:
+
+Added a top-level-only table of contents near the top of `bdr_standard_architectures/plans/PLAN__implement_specific_signatures.md`.
+
+---
