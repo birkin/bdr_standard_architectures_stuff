@@ -330,3 +330,15 @@ Main response:
 Added a top-level-only table of contents near the top of `bdr_standard_architectures/plans/PLAN__implement_specific_signatures.md`.
 
 ---
+
+Prompt:
+
+I've updated the plan with "FEEDBACK" (all caps), and look at the last few commits in case there were some direct-changes without that label.
+
+Update the plan accordingly, and do feel free to keep a section for new questions if desired.
+
+Main response:
+
+Updated `bdr_standard_architectures/plans/PLAN__implement_specific_signatures.md` to incorporate the marked feedback and recent direct plan changes. Added `children_signatures.yaml`, made specification YAML generation a core normal output, added the 1,000-child safety cap for `--fetch-all-children`, resolved known Solr/API field names, made MIME details part of object-definition identity by default, removed stale opt-in/feedback question language, and kept a short open-decisions section for implementation-time choices.
+
+---

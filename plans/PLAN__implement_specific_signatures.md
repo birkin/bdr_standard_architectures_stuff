@@ -8,10 +8,10 @@
 - [Coding Directives To Preserve](#coding-directives-to-preserve)
 - [Target Signature Model](#target-signature-model)
 - [Child Object Sampling Strategy](#child-object-sampling-strategy)
-- [API Fields To Review And Possibly Expand](#api-fields-to-review-and-possibly-expand)
+- [API Fields To Use And Possibly Expand](#api-fields-to-use-and-possibly-expand)
 - [Proposed Module Changes](#proposed-module-changes)
 - [Specification File Semantics](#specification-file-semantics)
-- [Output And CLI Design Options](#output-and-cli-design-options)
+- [Output And CLI Design](#output-and-cli-design)
 - [State And Cache Compatibility](#state-and-cache-compatibility)
 - [Testing Plan](#testing-plan)
 - [Implementation Sequence](#implementation-sequence)
@@ -46,6 +46,7 @@ specifications/object_definition_signatures.yaml
 specifications/open_access_signatures.yaml
 specifications/visibility_signatures.yaml
 specifications/auxiliary_relationships_signatures.yaml
+specifications/children_signatures.yaml
 specifications/composite_architecture_signatures.yaml
 ```
 
@@ -58,7 +59,7 @@ Important implementation correction: the current coarse signature includes `chil
 - Add a new child-object sample cap, tentatively named `--max-children-per-parent`, defaulting to `100`.
 - Keep `--fetch-all-children`, but reinterpret it carefully:
   - without `--fetch-all-children`, fetch at most `--max-children-per-parent` children per sampled parent and mark child evidence as truncated or sampled when more children exist;
-  - with `--fetch-all-children`, fetch all direct children, preserving the current opt-in behavior for deeper inspection.
+  - with `--fetch-all-children`, fetch all direct children up to a hard safety cap of 1,000 children per parent.
 - Do not include child truncation/sample metadata in signature hashes. Include it in observation metadata, state, JSON output, and Markdown warnings/notes.
 - Keep API response caching in `lib.cache.Cache` and `lib.api.ApiClient` unchanged unless a cache-key version bump is needed for materially different request parameters.
 - Keep the existing sampler workflow and state checkpointing, but change the data stored for each parent from one `signature_hash` to a richer observation/signature result.
@@ -136,6 +137,11 @@ Dimension signatures are narrow normalized structures. The initial dimensions sh
   - `has_transcripts`
   - `has_translations`
   - `has_annotations`
+- `children`
+  - represents the sorted unique object-definition signatures observed among a parent item's direct children;
+  - includes child object-definition signature hashes;
+  - does not include child display labels;
+  - does not include exact child counts.
 
 Each dimension signature should have:
 
@@ -147,22 +153,24 @@ Each dimension signature should have:
 
 The parent and child object-definition signatures can share the same builder and YAML file. Use `has_parent`, `has_children`, and `is_ordered` to distinguish context rather than creating separate parent-object and child-object signature types.
 
-### Child Object Definition Profile
+### Children Signature
 
-The composite needs a stable way to represent the set of observed child object definitions for a parent. Recommended initial implementation:
+The composite needs a stable way to represent the set of observed child object definitions for a parent. Implement this as its own signature type and YAML file:
+
+```text
+specifications/children_signatures.yaml
+```
+
+Recommended initial implementation:
 
 - build individual `object_definition` dimension signatures for child docs;
-- group child docs by child object-definition hash;
-- store a normalized child profile inside the composite signature as entries like:
-  - `object_definition_hash`
-  - `count_bucket`
-  - `ordered_count_bucket`, if ordered children are observed and this is useful;
-  - `display_label`, only if the implementation decides labels are architectural for child roles.
+- collect the unique child object-definition signature hashes observed for one parent;
+- sort those hashes deterministically;
+- build a `children` signature from that sorted list;
+- write observed children signatures to `specifications/children_signatures.yaml`;
+- include counts, count buckets, labels, and exemplar child PIDs as evidence/report metadata, not as default children-signature identity.
 
-By default, do not create a separate YAML file for child profiles. The profile can be a composite component derived from object-definition signatures. Add a separate `child_object_profile_signatures.yaml` only if review shows the profile itself needs labels, descriptions, examples, or reuse across composites.
-
-FEEDBACK: I'm thinking we should have an additional: `specifications/children_signatures.yaml` -- made up of the sorted unique object-definition-signatures discovered when going through the child-objects.
-
+Child display labels such as `rel_display_label_ssi` should not be part of children-signature identity.
 
 ### 3. Composite Architecture Signature
 
@@ -172,14 +180,14 @@ Initial composite identity should include:
 
 - parent relationship signature hash;
 - parent object definition signature hash;
-- normalized child object definition profile entries, primarily child object-definition signature hashes plus count buckets;
+- children signature hash;
 - open access signature hash;
 - visibility signature hash;
 - auxiliary relationship signature hash.
 
 The composite signature should not include human-readable labels, descriptions, narratives, exemplar PIDs, exact child counts, titles, collection membership, or observation metadata unless a future decision explicitly makes one of those part of architecture identity.
 
-Also exclude `children_truncated`, `child_sample_limit`, `total_child_count`, `observed_child_count`, and sampled parent counts from composite identity.
+Also exclude `children_truncated`, `child_sample_limit`, `total_child_count`, `observed_child_count`, sampled parent counts, and child display labels from composite identity.
 
 ## Child Object Sampling Strategy
 
@@ -203,7 +211,7 @@ Change `lib.sampling.fetch_children()` so it can return both docs and evidence m
 
 The current code fetches child rows with `rows = 500` and returns `(docs, truncated)`. Replace that tuple with a small dataclass so callers cannot mix up booleans and counts.
 
-With the new default, request `rows = normalized_rows(args.max_children_per_parent)` when not fetching all children. If `--fetch-all-children` is set, keep paginating with a safe page size such as `500`.
+With the new default, request `rows = normalized_rows(args.max_children_per_parent)` when not fetching all children. If `--fetch-all-children` is set, keep paginating with a safe page size such as `500`, but stop at 1,000 observed children per parent and mark the result as truncated when the API reports more than 1,000 direct children.
 
 Use the Solr `numFound` value to set truncation:
 
@@ -211,7 +219,7 @@ Use the Solr `numFound` value to set truncation:
 - `total_found <= observed_count` means `children_truncated: false`;
 - if `--fetch-all-children` is true and all pages completed, `children_truncated: false`.
 
-Validate `--max-children-per-parent` as a positive integer. The simplest first implementation can let `normalized_rows()` clamp unsafe values, but the CLI should eventually reject `0` and negative values with a clear parser error.
+Validate `--max-children-per-parent` as a positive integer. When `--fetch-all-children` is not set, the value must not exceed 1,000. When `--fetch-all-children` is set, the effective max is always 1,000; update help text so users understand that the flag means "fetch up to the 1,000-child safety cap."
 
 ### Ordering
 
@@ -224,7 +232,7 @@ For an initial implementation, the child sample can be the first `N` docs from t
 
 Because this means a capped sample is based on `pid asc` before local `child_sort_key` ordering, reports should call the strategy `first_by_pid_then_bdr_child_sort` or similar. Do not describe capped child evidence as a representative random sample.
 
-## API Fields To Review And Possibly Expand
+## API Fields To Use And Possibly Expand
 
 Current top-level item search fields include:
 
@@ -251,13 +259,24 @@ Current child search fields include:
 - `rel_is_translation_of_ssim`
 - `rel_display_label_ssi`
 
-Implementation should inspect sample API responses and decide the exact field names for:
+Use these known public/Solr fields where available:
 
-- `typeOfResource` or an equivalent Solr/API field;
-- license or rights statement;
-- embargo status, if publicly visible;
-- annotation relationships, if publicly visible;
+- `mods_type_of_resource` for `typeOfResource`;
+- rights/access-control fields from rightsMetadata where publicly returned, including `*_access_*_ssim`, `_display_public_bsi`, `_display_brown_bsi`, and `_display_private_bsi`;
+- MODS access-condition fields when publicly returned:
+  - `mods_access_condition_use_text_tsim`;
+  - `mods_access_condition_use_link_ssim`;
+  - `mods_access_condition_rights_text_tsim`;
+  - `mods_access_condition_rights_link_ssim`;
+  - `mods_access_condition_restriction_text_tsim`;
+- embargo fields `rel_pso_status_ssi` and `rel_embargo_years_ssim`;
+- annotation relationship field `rel_is_annotation_of_ssim`;
+- item API annotation data under `relations.hasAnnotation`, if item API calls are added for richer relationship evidence;
 - derivation, transcript, and translation relationships on both parent and child records.
+
+Embargo evidence is only partly observable through public data. Treat `rel_pso_status_ssi` and `rel_embargo_years_ssim` as recorded status/year evidence, not as a computed answer to whether the object is currently embargoed on the scan date.
+
+Annotation relationships are publicly observable when access allows the related records to be returned. The item API scrubs private access fields inside relations but does not remove the relationship itself.
 
 If a field is not reliably available from the public API, emit explicit `unknown` or `not_observed` values rather than over-interpreting absence.
 
@@ -273,8 +292,9 @@ Update `parse_args()`:
 
 - change `--sleep-seconds` default to `2.0`;
 - add `--max-children-per-parent`, type `int`, default `100`;
-- consider adding `--output-specifications-dir`, defaulting to `specifications`, if the implementation will write YAML specification files directly;
-- add `--write-specifications`, `store_true`, if specification YAML writing is implemented;
+- add `--output-specifications-dir`, defaulting to `specifications`;
+- do not add a `--write-specifications` flag. Specification YAML files are a core output of this tool and should be written by default;
+- update `--fetch-all-children` help text to explain that it fetches direct children up to the 1,000-child safety cap;
 - preserve existing flags unless there is a strong reason to rename one.
 
 Also update README's expanded default command and `tests/test.py::build_args()` after these argument changes.
@@ -285,7 +305,8 @@ If defaults are centralized there, add constants for:
 
 - default sleep seconds, if not already centralized;
 - default max children per parent;
-- default specifications directory, if used;
+- max children hard cap, recommended name `MAX_CHILDREN_PER_PARENT_CAP`, value `1000`;
+- default specifications directory;
 - increment `SCRIPT_VERSION` if state/cache compatibility should distinguish the new scan semantics.
 - add a separate `SIGNATURE_ARCHITECTURE_VERSION`, recommended value `2`, for state material parameters and output metadata. This is clearer than relying only on script version.
 
@@ -298,6 +319,7 @@ Add a return object or dataclass for child fetch results, for example `ChildFetc
 - `observed_count: int`
 - `truncated: bool`
 - `sample_limit: int`
+- `hard_limit: int`
 - `fetch_all_children: bool`
 - `fetch_strategy: str`
 
@@ -338,6 +360,7 @@ SignatureBundle
     parent_relationship
     parent_object_definition
     child_object_definitions
+    children
     open_access
     visibility
     auxiliary_relationships
@@ -353,7 +376,8 @@ Preserve existing helper behavior where possible:
 
 - `hash_signature()` remains the canonical deterministic hash helper.
 - `parse_datastreams()` can stay as a token helper, but add a separate helper if structured datastream details are needed.
-- `count_bucket()` remains useful for child profile counts, but exact counts should remain evidence/report metadata unless explicitly chosen as identity.
+- `count_bucket()` remains useful for reporting child evidence, but exact counts and count buckets should remain evidence/report metadata unless explicitly chosen as identity later.
+- MIME details should be included in object-definition identity by default. The current `--include-mime-types` flag can either be removed, retained as a compatibility no-op, or renamed only if there is a clear need to suppress MIME details.
 
 ### `lib/models.py`
 
@@ -373,6 +397,7 @@ SignatureIndex
   dimension_candidates:
     parent_relationship: {...}
     object_definition: {...}
+    children: {...}
     open_access: {...}
     visibility: {...}
     auxiliary_relationships: {...}
@@ -385,7 +410,7 @@ Recommended state-backed keys:
 
 - `composite_architecture_candidates` for the replacement architecture index;
 - `dimension_signature_candidates` for grouped dimension entries;
-- keep `common_architecture_candidates` only as a temporary backward-compatible alias if doing so materially reduces report churn. Do not store both long-term unless one is derived at report time.
+- do not keep `common_architecture_candidates` unless implementation review finds a current internal use that still needs it. The new state can make a clean break from old coarse-signature keys.
 
 ### `lib/sampler.py`
 
@@ -465,7 +490,7 @@ Markdown should include:
 - component dimension labels/hashes for each composite;
 - parent relationship summary;
 - parent object definition summary;
-- child object definition profile summary;
+- children signature summary;
 - open access, visibility, and auxiliary relationship summaries;
 - example collections and items;
 - mixed collections.
@@ -474,7 +499,7 @@ The report should make capped child sampling obvious so a reviewer does not mist
 
 Use output names that make the semantic shift explicit:
 
-- `architectures` can remain as the public JSON/report key if it now contains composite architecture candidates;
+- prefer `composite_architectures` as the JSON/report key for composite architecture candidates;
 - include `dimension_signatures` beside it;
 - add top-level `signature_architecture_version`;
 - add top-level `child_sampling` summary with default limit, total truncated parent observations, and fetch strategy.
@@ -486,6 +511,7 @@ Add a new module for writing YAML specification files, or for building specifica
 Responsibilities:
 
 - group observed dimension signatures by signature type;
+- group observed children signatures;
 - group observed composite architecture signatures;
 - attach generated descriptions and up to three exemplar PIDs;
 - write flat files directly under `specifications/`:
@@ -494,13 +520,15 @@ Responsibilities:
   - `open_access_signatures.yaml`
   - `visibility_signatures.yaml`
   - `auxiliary_relationships_signatures.yaml`
+  - `children_signatures.yaml`
   - `composite_architecture_signatures.yaml`
+- merge with existing YAML files when they already exist and were derived from the same API root/signature version. Because identifiers are deterministic hashes rather than newly generated UUIDs, existing entries with the same hash should be updated or enriched instead of duplicated.
 
 Dependency decision:
 
-- The project currently does not list `PyYAML` in `pyproject.toml`.
-- If robust YAML writing is needed, add `pyyaml~=6.0` and tests for emitted structures.
-- If avoiding a new dependency is preferred, generate simple YAML manually from controlled dictionaries, but this should be treated as more fragile.
+- The project currently does not list a YAML package in `pyproject.toml`.
+- Add a YAML dependency rather than hand-writing YAML. `PyYAML` is acceptable; a package that also supports schema validation is also acceptable if it stays simple.
+- Validate the generated data structures in tests before writing YAML.
 
 ## Specification File Semantics
 
@@ -536,44 +564,26 @@ Hash inputs should exclude:
 - exact PIDs;
 - timestamps;
 - scan settings;
-- child truncation metadata.
+- child truncation metadata;
+- child display labels.
 
 Hash inputs should include only the normalized `signature` structure for a dimension, or the normalized set of component hashes for a composite.
 
-## Output And CLI Design Options
+## Output And CLI Design
 
-There are two reasonable output designs.
+Specification YAML files are the core output of this tool and should be written during normal runs.
 
-### Option A: Write specifications as part of the normal run
+Add `--output-specifications-dir specifications` and write YAML files after the JSON/Markdown reports are built. There should be no opt-out flag.
 
-Add `--output-specifications-dir specifications` and write YAML files after the JSON/Markdown reports are built.
+Generated specification files should be treated as durable, build-out-over-time artifacts, not disposable scan scratch files. When a specification file already exists and was derived from the same API root and compatible signature architecture version, merge new observed signatures into it:
 
-Pros:
+- keep existing entries keyed by deterministic `signature_hash`;
+- add new entries for previously unseen hashes;
+- enrich existing entries with new exemplar PIDs or observed counts where appropriate;
+- preserve any human-entered description/status fields when possible;
+- avoid duplicating entries with the same hash.
 
-- One command generates all review artifacts.
-- The implementation stays close to the current pipeline.
-
-Cons:
-
-- Running exploratory scans may overwrite specification files unless paths are changed.
-- Users may need a flag to disable specification writes.
-
-### Option B: Add an explicit flag to write specifications
-
-Add `--output-specifications-dir specifications` and `--write-specifications`.
-
-Pros:
-
-- Safer default for exploratory runs.
-- Keeps generated reports separate from curated specification files.
-
-Cons:
-
-- More flags to explain.
-
-Recommended initial choice: Option B. The sampler can still include specification-ready structures in JSON output by default, while YAML writing requires explicit opt-in.
-
-If Option B is implemented, default runs should not write into the curated `specifications/` directory unless `--write-specifications` is set.
+Operational state can remain JSON or another internal format. Only the specification files need to be YAML.
 
 ## State And Cache Compatibility
 
@@ -603,12 +613,14 @@ Add or update tests for:
 - parent relationship signature detects no children, unordered children, and ordered children;
 - object definition signature normalizes datastream IDs and optional MIME details;
 - child sampling returns `truncated` when total children exceed `--max-children-per-parent` and `--fetch-all-children` is false;
-- child sampling does not truncate when `--fetch-all-children` is true;
+- child sampling with `--fetch-all-children` fetches through all pages up to the 1,000-child safety cap;
 - composite signatures are stable combinations of component hashes;
 - collection classification still works using composite hashes;
 - state compatibility rejects old coarse-signature state or mismatched child sampling settings;
 - Markdown report clearly shows component signatures and child evidence limits;
 - YAML specification output has the expected top-level structure.
+- YAML specification output merges with existing same-API/same-version entries without duplicating deterministic hashes.
+- `--fetch-all-children` stops at the 1,000-child safety cap and marks truncation when more children exist.
 
 ## Implementation Sequence
 
@@ -626,7 +638,7 @@ Add or update tests for:
 - Add dimension signature builder functions in `lib.signatures`.
 - Reuse current datastream parsing and hash helpers.
 - Build a `signature_bundle` for each parent item.
-- Include parent relationship, parent object definition, child object definition profile, open access, visibility, and auxiliary relationships.
+- Include parent relationship, parent object definition, children, open access, visibility, and auxiliary relationships.
 - Keep all unknown public-API fields explicit rather than inferred.
 
 ### Phase 3: Replace coarse architecture indexing with composite indexing
@@ -647,9 +659,10 @@ Add or update tests for:
 ### Phase 5: Generate specification YAML files
 
 - Add `lib.specifications`.
-- Add explicit CLI flag and output directory for specification writing.
+- Add output directory for specification writing.
 - Write flat YAML files under `specifications/`.
 - Include stable hashes, descriptions, exemplar PIDs, observed counts, and signature structures.
+- Merge deterministic-hash entries into existing specification YAML files when the API root and signature version are compatible.
 - Add tests for YAML/specification structures.
 
 ### Phase 6: Documentation and validation
@@ -682,7 +695,6 @@ uv run ./main.py \
   --collection-pids bdr:example_collection \
   --max-items-per-collection 10 \
   --max-children-per-parent 10 \
-  --write-specifications \
   --output-specifications-dir specifications \
   --refresh-state
 ```
@@ -717,61 +729,20 @@ uv run ./main.py \
   - Mitigate descriptions that say they document observed behavior, plus optional human-entered status fields in later work.
 - Child sampling may hide variation among later children.
   - Mitigate by recording `total_found`, observed count, sample limit, and truncation status in observation metadata and reports.
+- Merging generated YAML with existing curated entries could accidentally overwrite human notes.
+  - Mitigate by preserving existing human-entered fields and only updating deterministic/generated fields for matching hashes.
 
 ## Open Decisions For Implementation Session
 
-- Exact public API/Solr field name for `typeOfResource`.
-    - FEEDBACK: typeOfResource: Solr field is mods_type_of_resource.
-
-- Exact public API/Solr field name for license or rights statement.
-    - FEEDBACK: 
-        - License / rights statement: there are two different things. Rights/access control from rightsMetadata indexes to discover, display, modify, delete, Hydra-style *_access_*_ssim, and display booleans _display_public_bsi, _display_brown_bsi, _display_private_bsi
-        - MODS rights/license-ish display fields come from mods:accessCondition: mods_access_condition_use_text_tsim, mods_access_condition_use_link_ssim, mods_access_condition_rights_text_tsim, mods_access_condition_rights_link_ssim, and mods_access_condition_restriction_text_tsim
-        - not all of those may be public; do your best.
-
-- Whether current embargo status is publicly observable.
-    - FEEDBACK: Embargo status: yes, partly publicly observable if the object itself is publicly discoverable. RELS-EXT embargo metadata is indexed as rel_pso_status_ssi and rel_embargo_years_ssim. Embargo status: yes, partly publicly observable if the object itself is publicly discoverable. Caveat: this appears to expose recorded status/year values, not compute “currently embargoed” from exact dates.
-    RELS-EXT embargo metadata is indexed as rel_pso_status_ssi and rel_embargo_years_ssim.
-
-- Whether annotation relationships are publicly observable.
-    - FEEDBACK: Annotation relationships: yes, publicly observable when access allows the related records to be returned.
-    RELS-EXT isAnnotationOf indexes to rel_is_annotation_of_ssim via the generic rel_%s_ssim mapping. The item API
-    explicitly queries annotations and returns them under relations.hasAnnotation. Scrubbing removes private access fields inside relations, but not the relationship itself.
-
-- Whether YAML writing should add `PyYAML` or use a controlled manual emitter.
-    - FEEDBACK: sure, add that, or a package that can also validate the yaml.
-
-- Whether specification YAML writing should be opt-in from the start.
-    - FEEDBACK: There should be no opt-out option; specification-YAMLs are the core output of this tool.
-
-- Whether child object definition profile should preserve each child definition hash with count buckets, or group child definitions into a separate child-profile dimension.
-    - FEEDBACK: I'm a bit confused about this -- there is no specific "child" definition. I think you're saying that to create a composite-architecture-definition, you need to handle the type of children in some way. Correct? If so -- then I'm thinking we should have an additional: `specifications/children_signatures.yaml` -- made up of the sorted unique object-definition-signatures discovered when going through the child-objects.
- 
+- Whether to use `PyYAML` plus structural validation tests, or a YAML package that includes schema validation.
+- Whether existing `--include-mime-types` should be removed, retained as a compatibility no-op, or changed into a different advanced flag.
+- Whether item API calls are worth adding for richer `relations.hasAnnotation` evidence, or whether the first implementation should rely only on Search API fields.
+- Which existing human-entered fields in YAML files must be preserved during merge beyond description/status/narrative notes.
 
 
 ## Questions / Decision Points For Birkin
 
-These are the main decisions that would materially affect implementation:
-
-- Should MIME types now be part of object-definition identity by default? `PLAN__consider_specific_signatures.md` says to include MIME details when available, while the current CLI has `--include-mime-types` defaulting to false.
-    - FEEDBACK: Yes, include MIME types by default.
-
-- Should child display labels such as `rel_display_label_ssi` be part of child object profile identity, or only report/evidence context? Including them may distinguish architectural child roles, but may also split otherwise equivalent structures.
-    - FEEDBACK: No; do not include them.
-
-- Should generated YAML files be considered disposable scan artifacts by default, or should the implementation avoid writing to `specifications/` unless an explicit reviewed path is provided?
-    - FEEDBACK: I don't know what you mean by "disposable" -- overwriteable? Well -- these should be built-out over time -- and since the hashes are dirived from data, not "new UUIDs" -- pre-existing ones should be added to, as long as the api-from-which-the-data is derived is the same.
-
-- Is a separate child-profile specification file desirable now, or should child profiles stay as derived composite components until there is evidence they need independent curation?
-    - FEEDBACK: I addressed this above.
-
-- Should `--fetch-all-children` still fetch all direct children regardless of count, or should there be a hard safety ceiling to prevent unexpectedly huge scans?
-    FEEDBACK: make it max of 1,000 -- and update the flag-wording to indicate that.
-
-- Should old coarse JSON keys such as `architectures` and `common_architecture_candidates` be preserved as aliases for one release, or is a clean breaking output change acceptable?
-    FEEDBACK: if they're no longer useful, don't keep them. Note: although the `specification/` files will be yaml -- use whatever files you'd prefer internally to manage state-tracking and other operational work.
-
-
+No user-blocking questions remain before implementation. The open decisions above can be resolved during implementation with conservative choices and noted in the final implementation summary.
 
 ## Recommended Initial Assumptions
 
@@ -780,6 +751,9 @@ Unless implementation review finds contradictory evidence, assume:
 - Public API sampling is the visibility scope.
 - Missing rights/embargo fields mean `unknown`, not false or unrestricted.
 - Exact child counts do not define architecture identity.
-- Child count buckets and observed child object definition groups can support review without becoming exact-count identity.
+- Children signatures are built from sorted unique child object-definition signature hashes.
+- Child count buckets and observed child object definition groups can support review without becoming identity.
+- MIME details are part of object-definition identity by default.
+- Child display labels are evidence/report context only, not signature identity.
 - Composite architecture hashes are the replacement for the current coarse architecture hashes.
 - Existing cache and state mechanisms should be extended, not rewritten.
