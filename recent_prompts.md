@@ -248,3 +248,16 @@ Main response:
 - Added guidance that composite hashes can be calculated from component hashes while descriptions, narratives, and exemplars support human review.
 
 ---
+
+Plan feedback:
+
+- For the `# specifications/composite_architecture_signatures.yaml` example yaml file: the actual `signature` content used to build the `signature_hash` should not include the human-readable "label". That could change. Do keep the labels for each component -- just don't have them be part of the content-to-be-hashed.
+
+Main response:
+
+- Updated `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md`.
+- Moved human-readable component labels in the composite YAML example into `component_labels`.
+- Left only component `signature_hash` values inside the composite `signature` block.
+- Clarified that `description`, `narrative`, `component_labels`, and `exemplar_pids` support review but should not normally affect the composite hash.
+
+---

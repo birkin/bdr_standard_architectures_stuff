@@ -376,22 +376,23 @@ signatures:
       - bdr:example_composite_001
       - bdr:example_composite_002
       - bdr:example_composite_003
-    signature:
+    component_labels:
       parent_relationship_signature: parent_with_many_ordered_children
-      parent_relationship_signature_hash: hash_parent_001
       parent_object_definition_signature: metadata_only_parent
-      parent_object_definition_signature_hash: hash_object_001
       open_access_signature: public_domain_or_open_license
-      open_access_signature_hash: hash_open_access_001
       visibility_signature: public_api_observed
-      visibility_signature_hash: hash_visibility_001
       auxiliary_relationships_signature: no_observed_auxiliary_relationships
+    signature:
+      parent_relationship_signature_hash: hash_parent_001
+      parent_object_definition_signature_hash: hash_object_001
+      open_access_signature_hash: hash_open_access_001
+      visibility_signature_hash: hash_visibility_001
       auxiliary_relationships_signature_hash: hash_auxiliary_001
 ```
 
-Composite signatures should refer to dimension signatures by stable IDs and by the component `signature_hash` values.
+Composite signatures should keep human-readable component labels, but those labels should not be part of the content used to calculate the composite `signature_hash`.
 
-The composite `signature_hash` could be calculated from the component hashes, plus any other fields that are intentionally part of composite identity. Human-readable `description`, `narrative`, and `exemplar_pids` should support review and documentation, but should not normally affect the composite hash.
+The composite `signature_hash` could be calculated from the component hashes, plus any other fields that are intentionally part of composite identity. Human-readable `description`, `narrative`, `component_labels`, and `exemplar_pids` should support review and documentation, but should not normally affect the composite hash.
 
 ## Suggested Initial Specification Set
 
