@@ -102,3 +102,41 @@ Goal:
 - Add this prompt to `bdr_standard_architectures/recent_prompts.md`.
 
 ---
+
+Goal: Rethink object-architecture signatures, and make a new plan-document.
+
+Context:
+
+- object-architecture signature logic can be based on parent-child relationship, the parent-object's datastreams, and aspects of the child-objects.
+
+- I'm thinking of a new approach:
+	- There is a signature representing the parent-object relationship
+	- There is a signature representing on object's datastreams
+	- There is a signature representing an item's visibility. This may be for a future implementation since we're only using the public BDR-APIs.
+	- What else might be reasonable for a specific-level signature?
+	- Finally, there could be an overall calculated object-architecture signature that is based on the individual signatures.
+
+- I'm thinking that the way to build this out might be to update code to calculate these signatures on individual or a small set of collections.
+
+- "yaml" files in a directory called "specifications/" could incorporate human-readable "description" as well as the signature.
+
+- eventually the type and especially number of different types of signatures might warrant the yaml files being stored in subdirectories of the "specifications/" directory -- but initially let's try to either use a single yaml file or multiple yaml files all within the "specifications/" directory.
+
+Tasks:
+
+- Think about this idea.
+
+- Come up with one or two proposals to structure the file or files for this more-specific specification-approach.
+
+- Do not think about coding implementation yet -- let's explore the ideas.
+
+- Save the plan to `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md`
+
+Main response:
+
+- Created `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md`.
+- Proposed a dimension-signature model separating parent relationship, object datastream, child profile, future visibility, presentation/navigation, and auxiliary relationship signatures.
+- Included two YAML organization proposals: a single registry file and multiple flat files in `specifications/`.
+- Recommended starting with multiple flat YAML files if the project is moving toward reusable specifications, while noting that a single registry file may be better for short-lived brainstorming.
+
+---
