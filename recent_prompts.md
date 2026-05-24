@@ -140,3 +140,23 @@ Main response:
 - Recommended starting with multiple flat YAML files if the project is moving toward reusable specifications, while noting that a single registry file may be better for short-lived brainstorming.
 
 ---
+
+Goal: Refine `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md` plan.
+
+Context:
+
+- Review `bdr_standard_architectures/README.md` to understand the purpose of the project. Ignore the current specific implementation.
+- Incorporate follow-up decisions about parent relationship signatures, object datastream signatures, open-access signatures, visibility signatures, auxiliary relationship signatures, future video-streaming questions, and future allowed-values YAML files.
+- Incorporate direct `FEEDBACK` entries from the plan and remove those raw feedback entries from the final document.
+
+Main response:
+
+- Updated `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md`.
+- Added README-derived project context emphasizing observed BDR behavior and ingest-planning usefulness.
+- Clarified initial fields for `parent_relationship_signatures.yaml` and `object_datastream_signatures.yaml`.
+- Added `open_access_signatures.yaml` and `auxiliary_relationships_signatures.yaml` to the plan and YAML examples.
+- Added an `Answered Questions` section converting prior open questions and inline feedback into decisions.
+- Added future open questions about video streaming, allowed-values YAML files, required/optional datastream interpretation, and unknown embargo status.
+- Verified that no `FEEDBACK` markers remain.
+
+---

@@ -36,48 +36,78 @@ Separate these concepts:
   - Examples: public-API-only scope, sampled item count, truncated child fetches.
   - This should inform confidence, but should not usually define architecture identity.
 
+## Project Context From README
+
+This project identifies common object architectures in the Brown Digital Repository.
+
+The practical purpose is ingest planning: if an architecture is common in the BDR, it is more likely to be a pattern the repository already supports without custom development.
+
+For this plan, ignore the current implementation details and focus on a future-facing specification vocabulary that documents observed BDR behavior. The specifications should help explain what exists now, while leaving room for human-entered context such as `standard`, `non_standard`, `deprecated`, or local notes.
+
 ## Candidate Dimension Signatures
 
 ### 1. Parent Relationship Signature
 
-Represents how the top-level object relates to other objects.
+Represents how the top-level object relates to direct child objects.
 
-Possible fields:
+Initial file:
+
+```text
+specifications/parent_relationship_signatures.yaml
+```
+
+Initial fields:
 
 - `parent_object_type`
+  - The BDR object type of the top-level object being analyzed.
+  - This should be derived from the public API / Search API object-type field, currently observed in project code as `object_type`.
+  - This identifies whether the parent is something like an image, PDF-like object, implicit set, collection-like object, or another BDR object category.
 - `has_children`
-- `child_relation_type`
-- `child_count_bucket`
+  - Boolean.
+  - `true` when the sampled parent has observed direct children.
+  - `false` when the sampled parent appears standalone through public API sampling.
 - `ordered_children`
-- `membership_context`
+  - Boolean.
+  - `true` when child ordering is observed as structurally meaningful, likely through pagination/order fields such as `rel_has_pagination_ssim`.
+  - `false` when no ordering evidence is observed.
 
 This dimension answers questions like:
 
 - Is this a standalone object?
 - Is this a parent object with direct children?
 - Are the children page-like and ordered?
-- Is the object itself a child of another object?
+
+Fields such as `child_relation_type` and `membership_context` are not part of the initial direction. Direct child status can be treated as implied by the sampled parent/child lookup. Collection membership is important sampling context, but it should not define the parent relationship signature unless later review shows it changes architecture identity.
 
 ### 2. Object Datastream Signature
 
-Represents an object's own datastream inventory.
+Represents an object's own datastream inventory. This applies to both parent objects and child objects.
 
-Possible fields:
+Initial file:
+
+```text
+specifications/object_datastream_signatures.yaml
+```
+
+Initial fields:
 
 - `object_type`
+  - The BDR object type for the object whose datastreams are being described.
+  - This should be derived from the public API / Search API object-type field, currently observed in project code as `object_type`.
+  - This can describe either a parent object or a child object.
 - `datastream_ids`
-- `required_datastream_ids`
-- `optional_datastream_ids`
-- `content_datastream_ids`
-- `metadata_datastream_ids`
-- `derivative_datastream_ids`
+  - The observed datastream IDs for the object.
+  - These should be derived from the datastream inventory exposed by the API, currently observed in project code as `datastreams_ssi`.
+  - If MIME type is available for a datastream, include it as part of the datastream detail rather than treating MIME type as merely external variation.
 
 This dimension answers questions like:
 
 - Is this a PDF-like object?
 - Is this an image-like object?
 - Does this object include only metadata datastreams, or also content-bearing datastreams?
-- Do MIME-type differences matter for this signature, or should they be reported as variation?
+- Which datastream IDs and MIME types are actually observed for this object type?
+
+For now, codify what actually exists. Do not try to declare `required_datastream_ids` or `optional_datastream_ids` yet. Those categories are worth future review, but they require interpretation beyond the observed public-API evidence.
 
 ### 3. Child Profile Signature
 
@@ -99,27 +129,50 @@ This dimension answers questions like:
 - Do child datastreams match a known child-object signature?
 - Is child ordering structurally significant?
 
-### 4. Visibility Signature
+Exact child counts should not define architecture identity. Use count buckets where useful, and treat exact counts as observation/reporting metadata only.
+
+Child ordering belongs in both the parent relationship signature and the child profile signature because it describes the parent/child relationship and the profile of the child group.
+
+### 4. Open Access Signature
+
+Represents rights/open-access characteristics. This is different from visibility: visibility describes what the public API allowed us to observe; open access describes license and embargo status.
+
+Initial file:
+
+```text
+specifications/open_access_signatures.yaml
+```
+
+Initial fields:
+
+- `license`
+  - License or rights statement when available.
+- `current_embargo_status`
+  - Current embargo status when available.
+  - This is likely not fully visible through the public BDR API, so early values may need to distinguish observed values from unknown values.
+
+### 5. Visibility Signature
 
 Represents access or discoverability characteristics.
 
 This may need to remain future-facing if the initial work uses only public BDR APIs. Public API results can confirm that something is publicly discoverable, but cannot fully describe hidden, private, embargoed, or role-restricted material.
 
-Possible fields:
+Initial file:
+
+```text
+specifications/visibility_signatures.yaml
+```
+
+Initial public-API field/value:
 
 - `visibility_scope`
-- `discoverability`
-- `download_access`
-- `metadata_access`
-- `content_access`
-- `source`
+  - Use `public_api_observed`.
 
-Initial public-API value might be intentionally limited, such as:
+Initial description:
 
-- `visibility_scope: public_api_observed`
-- `description: Object was visible through public API sampling; non-public variants are out of scope.`
+- `Object was visible through public API sampling; non-public variants are out of scope.`
 
-### 5. Presentation Or Navigation Signature
+### 6. Presentation Or Navigation Signature
 
 Represents aspects that affect display or user navigation, even if they are not core preservation architecture.
 
@@ -133,19 +186,24 @@ Possible fields:
 
 This may be useful because two objects can have similar datastreams but require different presentation expectations.
 
-### 6. Auxiliary Relationship Signature
+### 7. Auxiliary Relationship Signature
 
 Represents relationships that may not be direct parent-child membership but still affect architecture.
 
-Possible fields:
+Initial file:
+
+```text
+specifications/auxiliary_relationships_signatures.yaml
+```
+
+Initial fields:
 
 - `has_derivations`
 - `has_transcripts`
 - `has_translations`
 - `has_annotations`
-- `has_versions`
 
-This should probably begin as secondary metadata, not part of the primary composite signature, unless review shows these relationships are central to standard ingest guidance.
+These relationships should be first-class dimensions in the specification vocabulary. Whether they participate in every composite architecture signature can be decided signature-by-signature.
 
 ## Proposal 1: Single YAML Registry File
 
@@ -166,19 +224,23 @@ dimension_signatures:
     standalone_object:
       description: Object has no observed direct children and is treated as a standalone top-level item.
       signature:
+        parent_object_type: image
         has_children: false
-        child_relation_type: none
-        child_count_bucket: none
+        ordered_children: false
 
   object_datastreams:
     pdf_object:
       description: Object has metadata/control datastreams plus a PDF content datastream.
       signature:
+        object_type: pdf
         datastream_ids:
           - MODS
           - PDF
           - RELS-EXT
           - rightsMetadata
+        datastream_details:
+          PDF:
+            mime_type: application/pdf
 
   child_profiles:
     many_image_children:
@@ -187,7 +249,30 @@ dimension_signatures:
         child_groups:
           - child_object_type: image
             count_bucket: many:10+
+            ordered: true
             child_datastream_signature_ref: image_child_object
+
+  open_access:
+    public_domain_or_open_license:
+      description: Object has an observed license or rights statement indicating open access.
+      signature:
+        license: observed_license_or_rights_statement
+        current_embargo_status: not_observed_or_not_embargoed
+
+  visibility:
+    public_api_observed:
+      description: Object was visible through public API sampling; non-public variants are out of scope.
+      signature:
+        visibility_scope: public_api_observed
+
+  auxiliary_relationships:
+    no_observed_auxiliary_relationships:
+      description: No derivation, transcript, translation, or annotation relationships were observed.
+      signature:
+        has_derivations: false
+        has_transcripts: false
+        has_translations: false
+        has_annotations: false
 
 composite_signatures:
   compound_object_with_image_children:
@@ -197,7 +282,9 @@ composite_signatures:
         parent_relationship: parent_with_many_ordered_children
         parent_datastreams: metadata_only_parent
         child_profile: many_image_children
+        open_access: public_domain_or_open_license
         visibility: public_api_observed
+        auxiliary_relationships: no_observed_auxiliary_relationships
 ```
 
 ### Strengths
@@ -225,7 +312,9 @@ Use several files, all directly inside `specifications/`:
 specifications/parent_relationship_signatures.yaml
 specifications/object_datastream_signatures.yaml
 specifications/child_profile_signatures.yaml
+specifications/open_access_signatures.yaml
 specifications/visibility_signatures.yaml
+specifications/auxiliary_relationships_signatures.yaml
 specifications/composite_architecture_signatures.yaml
 ```
 
@@ -240,6 +329,7 @@ signatures:
   metadata_only_parent:
     description: Parent-like object with descriptive/control datastreams but no primary binary content datastream.
     signature:
+      object_type: implicit-set
       datastream_ids:
         - MODS
         - RELS-EXT
@@ -248,12 +338,18 @@ signatures:
   image_child_object:
     description: Image-like child object with JP2 and thumbnail derivatives.
     signature:
+      object_type: image
       datastream_ids:
         - JP2
         - MODS
         - RELS-EXT
         - rightsMetadata
         - thumbnail
+      datastream_details:
+        JP2:
+          mime_type: image/jp2
+        thumbnail:
+          mime_type: image/jpeg
 ```
 
 ```yaml
@@ -268,7 +364,9 @@ signatures:
       parent_relationship_signature: parent_with_many_ordered_children
       parent_datastream_signature: metadata_only_parent
       child_profile_signature: many_image_children
+      open_access_signature: public_domain_or_open_license
       visibility_signature: public_api_observed
+      auxiliary_relationships_signature: no_observed_auxiliary_relationships
 ```
 
 ### Strengths
@@ -294,7 +392,7 @@ Start with **Proposal 2: multiple flat YAML files** if the goal is to move towar
 
 Reason:
 
-- The core idea is dimensional: relationship signatures, datastream signatures, child signatures, visibility signatures, and composite signatures are conceptually different things.
+- The core idea is dimensional: relationship signatures, datastream signatures, child signatures, open-access signatures, visibility signatures, auxiliary relationship signatures, and composite signatures are conceptually different things.
 - Separate files make that distinction visible.
 - The directory still remains simple because there are no subdirectories at first.
 - Composite signatures can explicitly show which dimension signatures they combine.
@@ -316,7 +414,9 @@ Possible initial dimension signatures:
 - `image_child_object`
 - `many_image_children`
 - `mixed_image_and_text_children`
+- `public_domain_or_open_license`
 - `public_api_observed`
+- `no_observed_auxiliary_relationships`
 
 Possible initial composite signatures:
 
@@ -337,24 +437,54 @@ Without designing implementation yet, the conceptual workflow can be:
 
 The review should capture both matches and mismatches. Mismatches may be more informative than matches because they reveal where the signature vocabulary is unclear.
 
+## Answered Questions
+
+- **Should datastream signatures distinguish required, optional, and derivative datastreams now?**
+  - Not yet. For now, datastream signatures should codify observed datastream IDs.
+  - Future review can add human interpretation about required, optional, content, metadata, and derivative datastreams.
+
+- **Should MIME type be part of datastream signatures?**
+  - Yes, if MIME type is available from the observed datastream inventory, include it in datastream detail.
+
+- **Should exact child counts define architecture identity?**
+  - No. Exact child counts are not relevant to architecture identity.
+  - Use count buckets where a child-profile summary needs to distinguish no children, one child, a few children, or many children.
+
+- **Should child ordering belong to the parent relationship signature, the child profile signature, or both?**
+  - Both. Ordering describes the parent/child relationship and also characterizes the child group.
+
+- **Should visibility be represented while using only the public BDR API?**
+  - Yes, but in a limited way.
+  - Use `visibility_scope: public_api_observed`.
+  - The description should make clear that the object was visible through public API sampling and that non-public variants are out of scope.
+
+- **Should auxiliary relationships be first-class dimensions?**
+  - Yes. Add `specifications/auxiliary_relationships_signatures.yaml` with booleans for derivations, transcripts, translations, and annotations.
+
+- **Should a composite signature be a strict combination of dimension signature IDs?**
+  - Yes, for now. Use strict combinations in the spirit of documenting observed BDR behavior.
+
+- **Should descriptions document observed behavior, recommended ingest patterns, or both?**
+  - For now, descriptions should document observed BDR behavior.
+  - Additional human-entered context can later indicate whether observed patterns are `standard`, `non_standard`, `deprecated`, or otherwise noteworthy.
+
 ## Open Questions
 
-- Should datastream signatures distinguish required, optional, and derivative datastreams, or should they initially use only observed datastream IDs?
-    - FEEDBACK: for now, only observed datastream IDs.
-- Should MIME type be part of datastream signatures, or a variation reported outside the signature?
-    - FEEDBACK: if we have it, let's include it.
-- Should exact child counts ever matter, or should count buckets always define architecture identity?
-    - FEEDBCK: ignore exact counts; not relevant.
-- Should child ordering be part of the parent relationship signature, the child profile signature, or both?
-    - FEEDBACK: let's say both.
-- Should visibility remain out of the composite signature until non-public API data is available?
-    - FEEDBACK: see my context notes elsewere for very limited "public" usage in the signature.
-- Should auxiliary relationships such as transcripts, translations, annotations, derivations, and versions become first-class dimensions?
-    - FEEDBACK: answered in my context notes.
-- Should a composite signature be a strict combination of dimension signature IDs, or should it allow overrides and local refinements?
-    - FEEDBACK: for now -- let's say strict combination for now -- in the spirit of documenting what exists.
-- Should human-readable descriptions describe observed BDR behavior, recommended ingest patterns, or both?
-    - FEEDBACK: for now, observed BDR behavior -- but there will be additional human-entered context indicating "standard"/"deprecated" content.
+- **How should video streaming be represented?**
+  - As video collections are analyzed, determine whether streaming can be inferred from a datastream, a Panopto URL in the BDR API response, or another field.
+  - Decide whether streaming belongs in the presentation/navigation signature, the object datastream signature, or a separate media-delivery signature.
+
+- **Should each signature type eventually have an allowed-values YAML file?**
+  - It would be useful to maintain a listing for each signature type showing all known values.
+  - Over time, those lists could be annotated with human-entered status such as `standard`, `non_standard`, `deprecated`, or local context.
+
+- **When should required and optional datastream interpretation be added?**
+  - The current direction is to document observed datastream IDs first.
+  - Later work can decide how to mark datastreams as required or optional for a given standard architecture.
+
+- **How should open-access fields distinguish observed values from unknown values?**
+  - License may be visible in public API responses, but current embargo status may not be.
+  - The specification vocabulary should avoid implying that unknown embargo status means no embargo.
 
 ## Proposed Next Step
 
