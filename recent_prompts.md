@@ -261,3 +261,25 @@ Main response:
 - Clarified that `description`, `narrative`, `component_labels`, and `exemplar_pids` support review but should not normally affect the composite hash.
 
 ---
+
+Goal: Develop a thorough implementation plan.
+
+Context:
+
+- Removed next-steps sections from `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md`.
+- Review `README.md`, `PLAN__consider_specific_signatures.md`, and `AGENTS.md`.
+- Preserve as much existing flag behavior and API response caching as reasonably possible.
+- Focus new work on capturing and building out signatures.
+- Keep default sampling of 100 parent items per collection.
+- Add default examination of 100 child objects per parent item.
+- Default to one request every 2 seconds due to increased child-object inspection.
+- Save the implementation plan to `bdr_standard_architectures/plans/PLAN__implement_specific_signatures.md`.
+- Do not change code yet.
+
+Main response:
+
+- Created `bdr_standard_architectures/plans/PLAN__implement_specific_signatures.md`.
+- Included current project context, implementation architecture, target signature model, child-object sampling changes, API/load concerns, state/cache compatibility, module-by-module changes, testing plan, smoke commands, risks, and open implementation decisions.
+- Did not change runtime code.
+
+---
