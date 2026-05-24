@@ -394,40 +394,6 @@ Composite signatures should keep human-readable component labels, but those labe
 
 The composite `signature_hash` could be calculated from the component hashes, plus any other fields that are intentionally part of composite identity. Human-readable `description`, `narrative`, `component_labels`, and `exemplar_pids` should support review and documentation, but should not normally affect the composite hash.
 
-## Suggested Initial Specification Set
-
-Begin with a small starter vocabulary rather than trying to classify all BDR architectures at once.
-
-Possible initial dimension signatures:
-
-- `standalone_object`
-- `parent_with_one_child`
-- `parent_with_few_children`
-- `parent_with_many_ordered_children`
-- `metadata_only_parent`
-- `pdf_object`
-- `image_child_object`
-- `public_domain_or_open_license`
-- `public_api_observed`
-- `no_observed_auxiliary_relationships`
-
-Possible initial composite signatures:
-
-- `standalone_pdf`
-- `standalone_image`
-- `metadata_parent_with_children`
-
-## How To Evaluate On Individual Or Small Sets Of Collections
-
-Without designing implementation yet, the conceptual workflow can be:
-
-1. Select one or a few collections that appear internally consistent.
-2. For a small sample of parent items, identify observed dimension signatures.
-3. Compare the observed dimensions to the YAML descriptions.
-4. Note where a dimension signature is too strict, too loose, or missing.
-5. Only after review, define a composite architecture signature.
-
-The review should capture both matches and mismatches. Mismatches may be more informative than matches because they reveal where the signature vocabulary is unclear.
 
 ## Answered Questions
 
@@ -477,8 +443,6 @@ The review should capture both matches and mismatches. Mismatches may be more in
   - License may be visible in public API responses, but current embargo status may not be.
   - The specification vocabulary should avoid implying that unknown embargo status means no embargo.
 
-## Proposed Next Step
+## Proposed Next Steps
 
-Create a small draft `specifications/` directory using multiple flat YAML files, with no more than four to six starter signatures.
-
-Then review those signatures against one or two known collections before changing any implementation. The goal of that review should be vocabulary validation, not full architecture detection.
+- coming.
