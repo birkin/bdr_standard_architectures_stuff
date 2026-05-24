@@ -17,6 +17,8 @@ The implementation should preserve as much of the current working behavior as re
 
 The main change is that the current single coarse parent/children architecture signature should become an output of several dimension signatures, with enough evidence saved to build YAML specification files and human-reviewable reports.
 
+Important implementation correction: the current coarse signature includes `children_truncated` inside the hashed signature. In the new architecture, child truncation/sampling status should move to observation/evidence metadata and should not participate in dimension or composite identity.
+
 ## Key Behavioral Changes
 
 - Default API pacing should change from `--sleep-seconds 0.5` to `--sleep-seconds 2.0` because the new work may inspect more child objects and therefore create more server load.
@@ -25,6 +27,7 @@ The main change is that the current single coarse parent/children architecture s
 - Keep `--fetch-all-children`, but reinterpret it carefully:
   - without `--fetch-all-children`, fetch at most `--max-children-per-parent` children per sampled parent and mark child evidence as truncated or sampled when more children exist;
   - with `--fetch-all-children`, fetch all direct children, preserving the current opt-in behavior for deeper inspection.
+- Do not include child truncation/sample metadata in signature hashes. Include it in observation metadata, state, JSON output, and Markdown warnings/notes.
 - Keep API response caching in `lib.cache.Cache` and `lib.api.ApiClient` unchanged unless a cache-key version bump is needed for materially different request parameters.
 - Keep the existing sampler workflow and state checkpointing, but change the data stored for each parent from one `signature_hash` to a richer observation/signature result.
 
@@ -46,6 +49,8 @@ The current code is organized around a straightforward pipeline:
 The existing API cache is valuable and should be preserved. `ApiClient._request_json()` keys cache entries by script version, API root, path, and request params. Because new child queries will include a different `rows` value or possibly additional fields, those requests naturally receive distinct cache files.
 
 The existing resumable state is also valuable. It currently tracks checked collection counts, checked collections, checked parent items, parent item signature hashes, architecture candidates, collection summaries, and warnings. The implementation should retain this checkpointing pattern, but it will likely need a state schema/version update because the meaning and shape of stored signatures will change.
+
+Current tests live in one file, `tests/test.py`, with a shared `build_args()` helper. Implementation should update that helper immediately after adding CLI/default args so older tests fail for behavior changes rather than missing attributes.
 
 ## Coding Directives To Preserve
 
@@ -108,6 +113,22 @@ Each dimension signature should have:
 - up to three exemplar PIDs;
 - counts useful for ranking/reporting.
 
+The parent and child object-definition signatures can share the same builder and YAML file. Use `has_parent`, `has_children`, and `is_ordered` to distinguish context rather than creating separate parent-object and child-object signature types.
+
+### Child Object Definition Profile
+
+The composite needs a stable way to represent the set of observed child object definitions for a parent. Recommended initial implementation:
+
+- build individual `object_definition` dimension signatures for child docs;
+- group child docs by child object-definition hash;
+- store a normalized child profile inside the composite signature as entries like:
+  - `object_definition_hash`
+  - `count_bucket`
+  - `ordered_count_bucket`, if ordered children are observed and this is useful;
+  - `display_label`, only if the implementation decides labels are architectural for child roles.
+
+By default, do not create a separate YAML file for child profiles. The profile can be a composite component derived from object-definition signatures. Add a separate `child_object_profile_signatures.yaml` only if review shows the profile itself needs labels, descriptions, examples, or reuse across composites.
+
 ### 3. Composite Architecture Signature
 
 A composite architecture signature combines selected dimension hashes into the architecture identity.
@@ -116,12 +137,14 @@ Initial composite identity should include:
 
 - parent relationship signature hash;
 - parent object definition signature hash;
-- child object definition profile signature hashes;
+- normalized child object definition profile entries, primarily child object-definition signature hashes plus count buckets;
 - open access signature hash;
 - visibility signature hash;
 - auxiliary relationship signature hash.
 
 The composite signature should not include human-readable labels, descriptions, narratives, exemplar PIDs, exact child counts, titles, collection membership, or observation metadata unless a future decision explicitly makes one of those part of architecture identity.
+
+Also exclude `children_truncated`, `child_sample_limit`, `total_child_count`, `observed_child_count`, and sampled parent counts from composite identity.
 
 ## Child Object Sampling Strategy
 
@@ -143,7 +166,17 @@ Change `lib.sampling.fetch_children()` so it can return both docs and evidence m
 - `child_sample_limit` value;
 - maybe `child_fetch_strategy`, initially `first` by stable sort.
 
-The current code fetches child rows with `rows = 500`. With the new default, it should request `rows = min(normalized_rows(args.max_children_per_parent), 500)` when not fetching all children. If `--fetch-all-children` is set, it can keep paginating with a safe page size.
+The current code fetches child rows with `rows = 500` and returns `(docs, truncated)`. Replace that tuple with a small dataclass so callers cannot mix up booleans and counts.
+
+With the new default, request `rows = normalized_rows(args.max_children_per_parent)` when not fetching all children. If `--fetch-all-children` is set, keep paginating with a safe page size such as `500`.
+
+Use the Solr `numFound` value to set truncation:
+
+- `total_found > observed_count` means `children_truncated: true`;
+- `total_found <= observed_count` means `children_truncated: false`;
+- if `--fetch-all-children` is true and all pages completed, `children_truncated: false`.
+
+Validate `--max-children-per-parent` as a positive integer. The simplest first implementation can let `normalized_rows()` clamp unsafe values, but the CLI should eventually reject `0` and negative values with a clear parser error.
 
 ### Ordering
 
@@ -153,6 +186,8 @@ Keep the existing child sort logic:
 - then unordered children by PID.
 
 For an initial implementation, the child sample can be the first `N` docs from the query result sorted by PID, then normalized with `child_sort_key`. If better ordered-child sampling is needed later, add it explicitly rather than hiding that policy in the signature builder.
+
+Because this means a capped sample is based on `pid asc` before local `child_sort_key` ordering, reports should call the strategy `first_by_pid_then_bdr_child_sort` or similar. Do not describe capped child evidence as a representative random sample.
 
 ## API Fields To Review And Possibly Expand
 
@@ -191,6 +226,8 @@ Implementation should inspect sample API responses and decide the exact field na
 
 If a field is not reliably available from the public API, emit explicit `unknown` or `not_observed` values rather than over-interpreting absence.
 
+Known current field lists are hard-coded in `lib.sampling.search_top_level_items()` and `lib.sampling.fetch_children()`. Add any new fields there first, and rely on the existing cache key's request params to separate old and new cached field lists.
+
 ## Proposed Module Changes
 
 ### `main.py`
@@ -202,7 +239,10 @@ Update `parse_args()`:
 - change `--sleep-seconds` default to `2.0`;
 - add `--max-children-per-parent`, type `int`, default `100`;
 - consider adding `--output-specifications-dir`, defaulting to `specifications`, if the implementation will write YAML specification files directly;
+- add `--write-specifications`, `store_true`, if specification YAML writing is implemented;
 - preserve existing flags unless there is a strong reason to rename one.
+
+Also update README's expanded default command and `tests/test.py::build_args()` after these argument changes.
 
 ### `lib/config.py`
 
@@ -212,6 +252,7 @@ If defaults are centralized there, add constants for:
 - default max children per parent;
 - default specifications directory, if used;
 - increment `SCRIPT_VERSION` if state/cache compatibility should distinguish the new scan semantics.
+- add a separate `SIGNATURE_ARCHITECTURE_VERSION`, recommended value `2`, for state material parameters and output metadata. This is clearer than relying only on script version.
 
 ### `lib/sampling.py`
 
@@ -222,6 +263,8 @@ Add a return object or dataclass for child fetch results, for example `ChildFetc
 - `observed_count: int`
 - `truncated: bool`
 - `sample_limit: int`
+- `fetch_all_children: bool`
+- `fetch_strategy: str`
 
 Then update callers to use the new structure.
 
@@ -242,6 +285,40 @@ Refactor this module around dimension builders while preserving reusable helpers
 - add a top-level `build_signature_bundle()` or similarly named function that returns all hashes and normalized structures for one parent observation.
 
 The current `build_item_signature()` can either become a compatibility wrapper or be replaced by the new bundle builder. If compatibility is easy, keeping a wrapper may reduce disruption in tests and reports.
+
+Recommended concrete return shape:
+
+```text
+SignatureBundle
+  observation:
+    collection_pid
+    parent_pid
+    child_total_found
+    child_observed_count
+    child_sample_limit
+    children_truncated
+    fetch_all_children
+    visibility_scope
+  dimensions:
+    parent_relationship
+    parent_object_definition
+    child_object_definitions
+    open_access
+    visibility
+    auxiliary_relationships
+  composite:
+    signature_hash
+    signature
+    component_hashes
+```
+
+This can be implemented as plain dictionaries first if that matches the surrounding code better than dataclasses.
+
+Preserve existing helper behavior where possible:
+
+- `hash_signature()` remains the canonical deterministic hash helper.
+- `parse_datastreams()` can stay as a token helper, but add a separate helper if structured datastream details are needed.
+- `count_bucket()` remains useful for child profile counts, but exact counts should remain evidence/report metadata unless explicitly chosen as identity.
 
 ### `lib/models.py`
 
@@ -269,6 +346,12 @@ SignatureIndex
 
 Keep collection classification centered on composite architecture hashes, because that best preserves the current meaning of `uniform`, `mostly_uniform`, and `mixed`.
 
+Recommended state-backed keys:
+
+- `composite_architecture_candidates` for the replacement architecture index;
+- `dimension_signature_candidates` for grouped dimension entries;
+- keep `common_architecture_candidates` only as a temporary backward-compatible alias if doing so materially reduces report churn. Do not store both long-term unless one is derived at report time.
+
 ### `lib/sampler.py`
 
 Keep the orchestration pattern.
@@ -283,7 +366,14 @@ For each selected collection:
 6. Classify the collection using composite hashes.
 7. Save progress after each parent and collection.
 
-The state key currently named `parent_item_signature_hashes` may become `parent_item_signature_results`. To avoid silent incompatible resumes, update state compatibility or schema versioning.
+The state key currently named `parent_item_signature_hashes` should become `parent_item_signature_results`. Each parent result should at least include:
+
+- `composite_signature_hash`;
+- dimension hashes used by the composite;
+- observation metadata needed to understand sampling/truncation;
+- enough minimal labels/counts for resume without recomputing already-checked parents.
+
+To avoid silent incompatible resumes, update state compatibility or schema versioning before changing sampler writes.
 
 ### `lib/state.py`
 
@@ -293,10 +383,22 @@ Recommended approach:
 
 - add or increment a state schema/version value;
 - include `max_children_per_parent` and new signature mode/spec version in material parameters;
+- include `signature_architecture_version` in material parameters;
 - preserve existing `refresh-state`, `no-resume`, and checked-progress behavior;
 - make incompatible old state fail clearly with a message instructing the user to use `--refresh-state` or a new state file.
 
 Do not try to migrate old coarse-signature state automatically unless implementation proves trivial. The new signature semantics are materially different.
+
+Suggested new-state fields:
+
+```text
+signature_architecture_version: 2
+parent_item_signature_results: {}
+dimension_signature_candidates: {}
+composite_architecture_candidates: {}
+```
+
+Old fields such as `parent_item_signature_hashes` and `common_architecture_candidates` can be absent in new state.
 
 ### `lib/classification.py`
 
@@ -334,6 +436,13 @@ Markdown should include:
 - mixed collections.
 
 The report should make capped child sampling obvious so a reviewer does not mistake a 100-child sample for complete evidence.
+
+Use output names that make the semantic shift explicit:
+
+- `architectures` can remain as the public JSON/report key if it now contains composite architecture candidates;
+- include `dimension_signatures` beside it;
+- add top-level `signature_architecture_version`;
+- add top-level `child_sampling` summary with default limit, total truncated parent observations, and fetch strategy.
 
 ### New `lib/specifications.py`
 
@@ -429,6 +538,8 @@ Cons:
 
 Recommended initial choice: Option B. The sampler can still include specification-ready structures in JSON output by default, while YAML writing requires explicit opt-in.
 
+If Option B is implemented, default runs should not write into the curated `specifications/` directory unless `--write-specifications` is set.
+
 ## State And Cache Compatibility
 
 ### Cache
@@ -473,6 +584,7 @@ Add or update tests for:
 - Update `fetch_children()` to cap default child inspection at 100 and return evidence metadata.
 - Update state material parameters and tests.
 - Ensure current JSON/Markdown reports still run with minimal shape changes.
+- Explicitly remove truncation from architecture identity when the new signature bundle is introduced; until then, avoid expanding reliance on the old `children_truncated` hash behavior.
 
 ### Phase 2: Build dimension signature bundle
 
@@ -580,6 +692,17 @@ uv run ./main.py \
 - Whether YAML writing should add `PyYAML` or use a controlled manual emitter.
 - Whether specification YAML writing should be opt-in from the start.
 - Whether child object definition profile should preserve each child definition hash with count buckets, or group child definitions into a separate child-profile dimension.
+
+## Questions / Decision Points For Birkin
+
+These are the main decisions that would materially affect implementation:
+
+- Should MIME types now be part of object-definition identity by default? `PLAN__consider_specific_signatures.md` says to include MIME details when available, while the current CLI has `--include-mime-types` defaulting to false.
+- Should child display labels such as `rel_display_label_ssi` be part of child object profile identity, or only report/evidence context? Including them may distinguish architectural child roles, but may also split otherwise equivalent structures.
+- Should generated YAML files be considered disposable scan artifacts by default, or should the implementation avoid writing to `specifications/` unless an explicit reviewed path is provided?
+- Is a separate child-profile specification file desirable now, or should child profiles stay as derived composite components until there is evidence they need independent curation?
+- Should `--fetch-all-children` still fetch all direct children regardless of count, or should there be a hard safety ceiling to prevent unexpectedly huge scans?
+- Should old coarse JSON keys such as `architectures` and `common_architecture_candidates` be preserved as aliases for one release, or is a clean breaking output change acceptable?
 
 ## Recommended Initial Assumptions
 

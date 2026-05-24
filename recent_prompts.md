@@ -283,3 +283,40 @@ Main response:
 - Did not change runtime code.
 
 ---
+
+Prompt:
+
+Here is a prompt that created a new plan:
+
+[--- START ---]
+Goal: Develop a thorough implementation plan.
+
+Context:
+
+- I removed the next-steps sections from the `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md` -- there will be a new plan for implementation.
+- Review `bdr_standard_architectures/README.md` to get an idea of the overall goal of this project -- and of the _current_ soon-to-be-changed implementation.
+- Review the `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md` -- this will be the basis for the new plan.
+- Review `bdr_standard_architectures/AGENTS.md` for coding-directives.
+- I really like the multiple flags and the caching of api responses in the current code implementation. Leave as much of the existing functionality in-place as reasonably possible.
+- The focus of the new work is on capturing and building out signatures.
+- Keep the idea that for a given collection -- default to examining 100 parent-items.
+- Add to this the idea that for each parent item -- default to examining 100 child-objects.
+
+Tasks:
+
+- Create an implementation plan to update the code to implement the new specification architecture.
+- Due to examining more child-objects, there may be more server load, so default to one request every 2 seconds.
+- Add to the plan any contextual info that might be useful if the plan were to be implemented in a new session.
+- Save the new plan to `bdr_standard_architectures/plans/PLAN__implement_specific_signatures.md`.
+- Don't change any code yet -- this is plan-work.
+[--- END ---]
+
+...And here is the resulting plan: `bdr_standard_architectures/plans/PLAN__implement_specific_signatures.md`.
+
+Please review the prompt, and the plan, and make any edits to the plan that would be useful for you to implement. Also feel free to add a section to the plan of Questions/Decision-points for me to answer.
+
+Main response:
+
+Reviewed the source prompt, existing implementation plan, `PLAN__consider_specific_signatures.md`, `README.md`, `AGENTS.md`, and relevant current modules. Updated `plans/PLAN__implement_specific_signatures.md` with implementation-focused clarifications around child sampling metadata, signature identity boundaries, child object profile structure, concrete state keys, report output names, test targets, and a Questions / Decision Points section for Birkin.
+
+---
