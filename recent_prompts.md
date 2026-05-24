@@ -1,47 +1,6 @@
-## original prompt
-
-Goal: develop a plan for a script.
-
-Context:
-
-The idea from a readme...
-
-```
-## Purpose
-
-The purpose of this script is to identify the most common standard object-architectures used in the Brown Digital Repository (BDR).
-
-The reason for this is so we can document and share with future ingesters the standard architectures that we know work and are supported without custom development.
-
-I'm thinking it might be possible to use the BDR-APIs to:
-- find all collections
-- sort them by largest-to-smallest
-- go through each doing the following:
-    - get a list of the items for the collection
-    - go through each doing the following:
-        - determine parent-child relationships
-        - determine the datastreams for the parent
-        - determine the datastreams for each child
-- if all the parent-child-relationships are the same -- or the first 100 are -- add that to the bucket of common-architectures.
-- stop after 20 collections (multiple collections might have the same architecture)
-```
-
-- I'm thinking it'd be worth reviewing:
-	- `bdr_ecosystem_project/AGENT_info/bdr_apis_project__AGENT_INDEX.yaml`
-	- `bdr_ecosystem_project/AGENT_info/bdr_solr_conf__AGENT_INDEX.yaml`
-	- <https://github.com/Brown-University-Library/bdr_api_documentation/wiki>
-
-Tasks:
-
-- Review the above recommendations.
-
-- Review any other file you think would be useful.
-
-- Save a thorough plan for such a script to `bdr_ecosystem_project/misc/PLAN__determine_most_common_architectures.md`
+_(in chronological order)_
 
 ---
-
-## followup prompts
 
 - Review `AGENTS.md` for coding-directives.
 

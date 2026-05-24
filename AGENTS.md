@@ -5,6 +5,11 @@ This file defines the canonical coding directives for this repository.
 If other instruction files exist (Copilot, IDE rules, contributor docs) and conflict with this file, follow this file and treat the others as stale.
 
 
+## Codex
+
+- Append each prompt and main response to the bottom of the file `bdr_standard_architectures/recent_prompts.md`, followed by a blank-line, then `---`, then another blank-line -- if and only if that file exists.
+
+
 ## Project basics
 
 - Primary language: Python
