@@ -160,3 +160,18 @@ Main response:
 - Verified that no `FEEDBACK` markers remain.
 
 ---
+
+also update the plan to go with `## Proposal 2: Multiple Flat YAML Files In `specifications/`
+
+My context answers should have made that clear.
+
+Please remove those two options and their strenghts and weaknesses -- since this has been decided. thx.
+
+Main response:
+
+- Updated `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md` to remove the proposal comparison.
+- Replaced the proposal sections with a single decided `Specification File Structure` section.
+- Removed strengths, weaknesses, recommendation, and remaining Proposal 1 / Proposal 2 language.
+- Updated the proposed next step to refer only to multiple flat YAML files.
+
+---

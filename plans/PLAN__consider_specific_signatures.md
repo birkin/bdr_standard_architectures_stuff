@@ -205,108 +205,11 @@ Initial fields:
 
 These relationships should be first-class dimensions in the specification vocabulary. Whether they participate in every composite architecture signature can be decided signature-by-signature.
 
-## Proposal 1: Single YAML Registry File
+## Specification File Structure
 
-Use one file:
+Use multiple flat YAML files, all directly inside `specifications/`.
 
-```text
-specifications/object_architecture_signatures.yaml
-```
-
-Conceptual shape:
-
-```yaml
-schema_version: 1
-purpose: Human-readable registry of specific object-architecture signature dimensions and composite signatures.
-
-dimension_signatures:
-  parent_relationship:
-    standalone_object:
-      description: Object has no observed direct children and is treated as a standalone top-level item.
-      signature:
-        parent_object_type: image
-        has_children: false
-        ordered_children: false
-
-  object_datastreams:
-    pdf_object:
-      description: Object has metadata/control datastreams plus a PDF content datastream.
-      signature:
-        object_type: pdf
-        datastream_ids:
-          - MODS
-          - PDF
-          - RELS-EXT
-          - rightsMetadata
-        datastream_details:
-          PDF:
-            mime_type: application/pdf
-
-  child_profiles:
-    many_image_children:
-      description: Parent has many image-like children, usually representing pages or ordered image components.
-      signature:
-        child_groups:
-          - child_object_type: image
-            count_bucket: many:10+
-            ordered: true
-            child_datastream_signature_ref: image_child_object
-
-  open_access:
-    public_domain_or_open_license:
-      description: Object has an observed license or rights statement indicating open access.
-      signature:
-        license: observed_license_or_rights_statement
-        current_embargo_status: not_observed_or_not_embargoed
-
-  visibility:
-    public_api_observed:
-      description: Object was visible through public API sampling; non-public variants are out of scope.
-      signature:
-        visibility_scope: public_api_observed
-
-  auxiliary_relationships:
-    no_observed_auxiliary_relationships:
-      description: No derivation, transcript, translation, or annotation relationships were observed.
-      signature:
-        has_derivations: false
-        has_transcripts: false
-        has_translations: false
-        has_annotations: false
-
-composite_signatures:
-  compound_object_with_image_children:
-    description: Parent object with metadata/control datastreams and many image-like child objects.
-    signature:
-      dimensions:
-        parent_relationship: parent_with_many_ordered_children
-        parent_datastreams: metadata_only_parent
-        child_profile: many_image_children
-        open_access: public_domain_or_open_license
-        visibility: public_api_observed
-        auxiliary_relationships: no_observed_auxiliary_relationships
-```
-
-### Strengths
-
-- **Simple start**: One file is easy to review and version-control.
-- **Low ceremony**: No need to decide file boundaries too early.
-- **Good for discussion**: Reviewers can see all proposed dimensions and composites together.
-- **Easy to refactor later**: Entries can later be moved into separate files or subdirectories.
-
-### Weaknesses
-
-- **Can become large**: The file may become unwieldy as signature categories grow.
-- **Merge conflicts**: Multiple people editing different signature categories may collide.
-- **Weaker ownership boundaries**: It may be less obvious which section is authoritative for a given signature type.
-
-### Best Use
-
-This is best if the immediate goal is conceptual exploration and a small number of initial signatures.
-
-## Proposal 2: Multiple Flat YAML Files In `specifications/`
-
-Use several files, all directly inside `specifications/`:
+This is the decided direction because the core idea is dimensional: relationship signatures, datastream signatures, child signatures, open-access signatures, visibility signatures, auxiliary relationship signatures, and composite signatures are conceptually different things. Separate files make those distinctions visible while keeping the initial directory structure simple.
 
 ```text
 specifications/parent_relationship_signatures.yaml
@@ -318,7 +221,7 @@ specifications/auxiliary_relationships_signatures.yaml
 specifications/composite_architecture_signatures.yaml
 ```
 
-Conceptual shape:
+Initial conceptual shape:
 
 ```yaml
 # specifications/object_datastream_signatures.yaml
@@ -369,35 +272,7 @@ signatures:
       auxiliary_relationships_signature: no_observed_auxiliary_relationships
 ```
 
-### Strengths
-
-- **Clear separation**: Each file has one signature type.
-- **Scales better**: New dimensions can be added without making one registry file enormous.
-- **Easier review**: Reviewers can focus on parent relationships, datastreams, child profiles, or composites separately.
-- **Natural migration path**: If needed, each file can later become a subdirectory category.
-
-### Weaknesses
-
-- **More structure upfront**: Requires naming conventions and cross-file references earlier.
-- **Reference consistency**: Composite signatures must refer to dimension signatures by stable IDs.
-- **Slightly higher review burden**: Understanding one composite may require opening several files.
-
-### Best Use
-
-This is best if the project expects signature dimensions to grow or if the team wants each dimension to be independently curated.
-
-## Recommendation
-
-Start with **Proposal 2: multiple flat YAML files** if the goal is to move toward real reusable specifications.
-
-Reason:
-
-- The core idea is dimensional: relationship signatures, datastream signatures, child signatures, open-access signatures, visibility signatures, auxiliary relationship signatures, and composite signatures are conceptually different things.
-- Separate files make that distinction visible.
-- The directory still remains simple because there are no subdirectories at first.
-- Composite signatures can explicitly show which dimension signatures they combine.
-
-If the next step is still mostly brainstorming, use **Proposal 1** for one short-lived registry file, then split it once the vocabulary stabilizes.
+Composite signatures should refer to dimension signatures by stable IDs.
 
 ## Suggested Initial Specification Set
 
@@ -488,6 +363,6 @@ The review should capture both matches and mismatches. Mismatches may be more in
 
 ## Proposed Next Step
 
-Create a small draft `specifications/` directory using either Proposal 1 or Proposal 2, with no more than four to six starter signatures.
+Create a small draft `specifications/` directory using multiple flat YAML files, with no more than four to six starter signatures.
 
 Then review those signatures against one or two known collections before changing any implementation. The goal of that review should be vocabulary validation, not full architecture detection.
