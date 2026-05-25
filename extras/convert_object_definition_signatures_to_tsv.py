@@ -9,7 +9,7 @@ import yaml
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_INPUT_PATH = PROJECT_ROOT / 'specifications' / 'object_definition_signatures.yaml'
-DEFAULT_OUTPUT_PATH = PROJECT_ROOT / 'TSVs' / 'object_definition_signatures.tsv'
+DEFAULT_OUTPUT_PATH = PROJECT_ROOT.parent / 'TSVs' / 'object_definition_signatures.tsv'
 FIELDNAMES = [
     'entry_key',
     'signature_hash',

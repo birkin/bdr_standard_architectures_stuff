@@ -410,3 +410,13 @@ Main response:
 Created `TSVs/` in the project repository parent directory.
 
 ---
+
+Prompt:
+
+update the script to save the TSV files to a TSV directory sibling to (not inside) of `bdr_standard_architectures`.
+
+Main response:
+
+Updated `extras/convert_object_definition_signatures_to_tsv.py` to write to the parent-level `../TSVs/object_definition_signatures.tsv`, updated `extras/extras_README.md`, ran the converter successfully, and verified ruff passed.
+
+---

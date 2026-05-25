@@ -20,7 +20,9 @@ specifications/object_definition_signatures.yaml
 Output:
 
 ```text
-TSVs/object_definition_signatures.tsv
+../TSVs/object_definition_signatures.tsv
 ```
 
 The TSV contains one row per object-definition signature entry. Columns include signature hash, label, description, observed count, exemplar PIDs, object type, `typeOfResource`, parent/child/order booleans, datastream IDs, datastream detail JSON, and full signature JSON.
+
+The `TSVs/` directory is a sibling of `bdr_standard_architectures/`, not inside the project package.
