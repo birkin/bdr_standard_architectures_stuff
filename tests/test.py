@@ -392,7 +392,6 @@ class TestMain(unittest.TestCase):
                         'label': 'public api observed',
                         'description': 'Observed through public API.',
                         'exemplar_pids': ['bdr:1'],
-                        'observed_count': 1,
                         'signature': {'visibility_scope': 'public_api_observed'},
                     }
                 }
@@ -403,7 +402,9 @@ class TestMain(unittest.TestCase):
         documents = build_specification_documents(result)
 
         validate_specification_document(documents['visibility'])
-        self.assertIn('public_api_observed', documents['visibility']['signatures']['public_api_observed_abc123']['signature'].values())
+        entry = documents['visibility']['signatures']['public_api_observed_abc123']
+        self.assertIn('public_api_observed', entry['signature'].values())
+        self.assertNotIn('observed_count', entry)
 
     def test_merge_signature_entry_preserves_label_like_fields(self) -> None:
         """
@@ -414,7 +415,6 @@ class TestMain(unittest.TestCase):
             'label': 'Reviewed label',
             'description': 'Reviewed description',
             'exemplar_pids': ['bdr:old'],
-            'observed_count': 1,
             'signature': {'a': 1},
         }
         new = {
@@ -422,7 +422,6 @@ class TestMain(unittest.TestCase):
             'label': 'Generated label',
             'description': 'Generated description',
             'exemplar_pids': ['bdr:new'],
-            'observed_count': 2,
             'signature': {'a': 1},
         }
 

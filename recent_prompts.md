@@ -460,3 +460,33 @@ Main response:
 Updated `DEFAULT_SPECIFICATIONS_DIR` to point to the parent-level `../specifications` directory, updated the object-definition TSV converter input path, updated README and extras README documentation, added a test asserting the specifications path is outside the project root, and verified with `uv run ./run_tests.py`, `uv run ruff check .`, and `uv run ./main.py --help`.
 
 ---
+
+Prompt:
+
+Goal: consider removing the `observed_count` from the specification-output.
+
+Context:
+
+- my thinking is that everything about specifications should concern validation. And `observed_count` is more an artifact of processing.
+- I like the idea of specification-files changing, but only in the direction of being built-out and becoming more comprehensive. New `observed_count` values when running a new collection don't facilitate that.
+- My thought: if it's useful for processing or providing info about processing it could be put elsewhere.
+
+Tasks:
+
+- give me your take on this.
+
+Main response:
+
+Agreed that `observed_count` should be removed from durable specification YAML because it is run metadata rather than validation semantics. Recommended keeping count information in run artifacts such as JSON reports, Markdown reports, or resumable state, while letting specification files change only when reusable signature knowledge changes.
+
+---
+
+Prompt:
+
+Proceed to remove it from specifications and update necessary code. Feel free to add it elsewhere if you think it's useful.
+
+Main response:
+
+Removed `observed_count` from generated specification YAML entries and from specification validation. Updated tests, README, the implementation plan example, and the object-definition TSV converter so TSV output no longer includes that column. Regenerated the sibling TSV file and verified with `uv run ./run_tests.py`, `uv run ruff check .`, and `uv run ./extras/convert_object_definition_signatures_to_tsv.py`.
+
+---

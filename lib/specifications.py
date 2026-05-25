@@ -76,7 +76,6 @@ def build_signature_map(entries: list[dict[str, Any]]) -> dict[str, dict[str, An
             'label': entry.get('label', ''),
             'description': entry.get('description', ''),
             'exemplar_pids': entry.get('exemplar_pids', []),
-            'observed_count': entry.get('observed_count', entry.get('total_sampled_items', 0)),
             'signature': entry.get('signature', {}),
         }
         if entry.get('component_hashes'):
@@ -196,7 +195,7 @@ def validate_signature_entry(entry: dict[str, Any]) -> None:
     Validates one specification signature entry.
     Called by: validate_specification_document()
     """
-    required_keys = {'signature_hash', 'label', 'description', 'exemplar_pids', 'observed_count', 'signature'}
+    required_keys = {'signature_hash', 'label', 'description', 'exemplar_pids', 'signature'}
     missing_keys = required_keys - set(entry)
     if missing_keys:
         raise ValueError(f'Missing signature entry keys: {sorted(missing_keys)}')

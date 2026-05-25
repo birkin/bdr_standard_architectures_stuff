@@ -336,6 +336,7 @@ Why that is useful:
 - Markdown supports human review with BDR maintainers and ingest planners.
 - YAML specifications are the core reusable output for building up architecture knowledge over time.
 - Incremental YAML writes preserve newly discovered specifications even if a later collection or network request fails.
+- Run-specific counts remain in JSON/Markdown output and resumable state; specification YAML omits processing metadata such as `observed_count`.
 
 ## Argument Reference
 

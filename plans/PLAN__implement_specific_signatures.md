@@ -545,13 +545,13 @@ signatures:
     description: Human-readable observed-behavior description.
     exemplar_pids:
       - bdr:example
-    observed_count: 123
     signature:
       has_children: true
       ordered_children: false
 ```
 
 Labels should be stable enough for review, but the hash should be the true machine identifier.
+Operational counts such as `observed_count` should remain in JSON reports, Markdown reports, or resumable state rather than in durable specification YAML files.
 
 Hash inputs should exclude:
 
