@@ -92,7 +92,7 @@ signatures:
     - bdr:1104418
     - bdr:1104419
     - bdr:1105014
-    observed_count: 17
+    observed_count: 5
     signature:
       object_type: pdf
       typeOfResource: text
@@ -541,7 +541,7 @@ signatures:
     - bdr:1102288
     - bdr:1102289
     - bdr:1102290
-    observed_count: 34
+    observed_count: 3
     signature:
       object_type: pdf
       typeOfResource: text
@@ -986,3 +986,627 @@ signatures:
         mime_type: application/octet-stream
       - id: thumbnail
         mime_type: image/jpeg
+  zip_object_definition_06f6d148d9c5:
+    signature_hash: 06f6d148d9c5
+    label: zip object definition
+    description: Observed zip object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1002868
+    - bdr:1002871
+    - bdr:1002872
+    observed_count: 69
+    signature:
+      object_type: zip
+      typeOfResource: software, multimedia
+      has_parent: false
+      has_children: false
+      is_ordered: false
+      datastream_ids:
+      - DC
+      - MODS
+      - RELS-EXT
+      - RELS-INT
+      - ZIP
+      - irMetadata
+      - rightsMetadata
+      datastream_details:
+      - id: DC
+        mime_type: application/octet-stream
+      - id: MODS
+        mime_type: text/xml
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: ZIP
+        mime_type: application/zip
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+  undetermined_object_definition_14bc4801e7dd:
+    signature_hash: 14bc4801e7dd
+    label: undetermined object definition
+    description: Observed undetermined object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1054581
+    observed_count: 1
+    signature:
+      object_type: undetermined
+      typeOfResource: mixed material
+      has_parent: false
+      has_children: true
+      is_ordered: false
+      datastream_ids:
+      - DC
+      - MODS
+      - RELS-EXT
+      - RELS-INT
+      - irMetadata
+      - rightsMetadata
+      datastream_details:
+      - id: DC
+        mime_type: application/octet-stream
+      - id: MODS
+        mime_type: text/xml
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+  undetermined_object_definition_6e9712a017b5:
+    signature_hash: 6e9712a017b5
+    label: undetermined object definition
+    description: Observed undetermined object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1054717
+    - bdr:1054744
+    observed_count: 2
+    signature:
+      object_type: undetermined
+      typeOfResource: software, multimedia
+      has_parent: true
+      has_children: false
+      is_ordered: true
+      datastream_ids:
+      - DC
+      - MODS
+      - RELS-EXT
+      - RELS-INT
+      - irMetadata
+      - rightsMetadata
+      datastream_details:
+      - id: DC
+        mime_type: application/octet-stream
+      - id: MODS
+        mime_type: text/xml
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+  zip_object_definition_75434c2a4827:
+    signature_hash: 75434c2a4827
+    label: zip object definition
+    description: Observed zip object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1054596
+    - bdr:1104399
+    - bdr:1114617
+    observed_count: 20
+    signature:
+      object_type: zip
+      typeOfResource: software, multimedia
+      has_parent: true
+      has_children: false
+      is_ordered: true
+      datastream_ids:
+      - DC
+      - MODS
+      - RELS-EXT
+      - RELS-INT
+      - ZIP
+      - irMetadata
+      - rightsMetadata
+      datastream_details:
+      - id: DC
+        mime_type: application/octet-stream
+      - id: MODS
+        mime_type: text/xml
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: ZIP
+        mime_type: application/zip
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+  zip_object_definition_3ceefb9ad2d3:
+    signature_hash: 3ceefb9ad2d3
+    label: zip object definition
+    description: Observed zip object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1067034
+    observed_count: 1
+    signature:
+      object_type: zip
+      typeOfResource: software, multimedia
+      has_parent: false
+      has_children: true
+      is_ordered: false
+      datastream_ids:
+      - DC
+      - MODS
+      - RELS-EXT
+      - RELS-INT
+      - ZIP
+      - irMetadata
+      - rightsMetadata
+      datastream_details:
+      - id: DC
+        mime_type: application/octet-stream
+      - id: MODS
+        mime_type: text/xml
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: ZIP
+        mime_type: application/zip
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+  zip_object_definition_6dbca8d94321:
+    signature_hash: 6dbca8d94321
+    label: zip object definition
+    description: Observed zip object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1078411
+    - bdr:1078471
+    - bdr:1078474
+    observed_count: 8
+    signature:
+      object_type: zip
+      typeOfResource: text
+      has_parent: false
+      has_children: false
+      is_ordered: false
+      datastream_ids:
+      - DC
+      - MODS
+      - RELS-EXT
+      - RELS-INT
+      - ZIP
+      - irMetadata
+      - rightsMetadata
+      datastream_details:
+      - id: DC
+        mime_type: application/octet-stream
+      - id: MODS
+        mime_type: text/xml
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: ZIP
+        mime_type: application/zip
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+  zip_object_definition_9068ac4adfab:
+    signature_hash: 9068ac4adfab
+    label: zip object definition
+    description: Observed zip object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1078482
+    observed_count: 1
+    signature:
+      object_type: zip
+      typeOfResource: software, multimedia
+      has_parent: false
+      has_children: false
+      is_ordered: false
+      datastream_ids:
+      - DC
+      - MODS
+      - RELS-EXT
+      - RELS-INT
+      - ZIP
+      - irMetadata
+      - rightsMetadata
+      datastream_details:
+      - id: DC
+        mime_type: application/octet-stream
+      - id: MODS
+        mime_type: text/xml
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: ZIP
+        mime_type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+  tar_object_definition_68cb22a2e814:
+    signature_hash: 68cb22a2e814
+    label: tar object definition
+    description: Observed tar object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1082415
+    observed_count: 1
+    signature:
+      object_type: tar
+      typeOfResource: software, multimedia
+      has_parent: false
+      has_children: true
+      is_ordered: false
+      datastream_ids:
+      - DC
+      - MODS
+      - RELS-EXT
+      - RELS-INT
+      - TAR
+      - irMetadata
+      - rightsMetadata
+      datastream_details:
+      - id: DC
+        mime_type: application/octet-stream
+      - id: MODS
+        mime_type: text/xml
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: TAR
+        mime_type: application/x-tar
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+  xlsx_object_definition_e609bb5496f2:
+    signature_hash: e609bb5496f2
+    label: xlsx object definition
+    description: Observed xlsx object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1093299
+    observed_count: 1
+    signature:
+      object_type: xlsx
+      typeOfResource: text
+      has_parent: false
+      has_children: false
+      is_ordered: false
+      datastream_ids:
+      - DC
+      - MODS
+      - RELS-EXT
+      - RELS-INT
+      - XLSX
+      - irMetadata
+      - rightsMetadata
+      datastream_details:
+      - id: DC
+        mime_type: application/octet-stream
+      - id: MODS
+        mime_type: text/xml
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: XLSX
+        mime_type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+  pdf_object_definition_8f8604945b7a:
+    signature_hash: 8f8604945b7a
+    label: pdf object definition
+    description: Observed pdf object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1093305
+    observed_count: 1
+    signature:
+      object_type: pdf
+      typeOfResource: software, multimedia
+      has_parent: false
+      has_children: true
+      is_ordered: false
+      datastream_ids:
+      - DC
+      - MODS
+      - PDF
+      - RELS-EXT
+      - RELS-INT
+      - irMetadata
+      - rightsMetadata
+      datastream_details:
+      - id: DC
+        mime_type: application/octet-stream
+      - id: MODS
+        mime_type: text/xml
+      - id: PDF
+        mime_type: application/pdf
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+  zip_object_definition_b3e71b20d92f:
+    signature_hash: b3e71b20d92f
+    label: zip object definition
+    description: Observed zip object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1093374
+    - bdr:1136944
+    observed_count: 2
+    signature:
+      object_type: zip
+      typeOfResource: text
+      has_parent: false
+      has_children: false
+      is_ordered: false
+      datastream_ids:
+      - DC
+      - MODS
+      - RELS-EXT
+      - RELS-INT
+      - XLSX
+      - ZIP
+      - irMetadata
+      - rightsMetadata
+      datastream_details:
+      - id: DC
+        mime_type: application/octet-stream
+      - id: MODS
+        mime_type: text/xml
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: XLSX
+        mime_type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+      - id: ZIP
+        mime_type: application/zip
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+  zip_object_definition_4a124159aee5:
+    signature_hash: 4a124159aee5
+    label: zip object definition
+    description: Observed zip object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1102322
+    - bdr:1140620
+    observed_count: 2
+    signature:
+      object_type: zip
+      typeOfResource: research_datasets
+      has_parent: false
+      has_children: false
+      is_ordered: false
+      datastream_ids:
+      - DC
+      - MODS
+      - RELS-EXT
+      - RELS-INT
+      - ZIP
+      - irMetadata
+      - rightsMetadata
+      datastream_details:
+      - id: DC
+        mime_type: application/octet-stream
+      - id: MODS
+        mime_type: text/xml
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: ZIP
+        mime_type: application/zip
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+  zip_object_definition_953262dc9e74:
+    signature_hash: 953262dc9e74
+    label: zip object definition
+    description: Observed zip object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1113162
+    - bdr:1117604
+    - bdr:1127795
+    observed_count: 3
+    signature:
+      object_type: zip
+      typeOfResource: mixed material
+      has_parent: false
+      has_children: false
+      is_ordered: false
+      datastream_ids:
+      - DC
+      - MODS
+      - RELS-EXT
+      - RELS-INT
+      - ZIP
+      - irMetadata
+      - rightsMetadata
+      datastream_details:
+      - id: DC
+        mime_type: application/octet-stream
+      - id: MODS
+        mime_type: text/xml
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: ZIP
+        mime_type: application/zip
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+  video_object_definition_644c74033009:
+    signature_hash: 644c74033009
+    label: video object definition
+    description: Observed video object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1128451
+    - bdr:1147336
+    observed_count: 2
+    signature:
+      object_type: video
+      typeOfResource: moving image
+      has_parent: false
+      has_children: false
+      is_ordered: false
+      datastream_ids:
+      - DC
+      - MODS
+      - RELS-EXT
+      - RELS-INT
+      - VIDEO-MASTER
+      - irMetadata
+      - rightsMetadata
+      datastream_details:
+      - id: DC
+        mime_type: application/octet-stream
+      - id: MODS
+        mime_type: text/xml
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: VIDEO-MASTER
+        mime_type: video/mp4
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+  pdf_object_definition_7ecb310f6c59:
+    signature_hash: 7ecb310f6c59
+    label: pdf object definition
+    description: Observed pdf object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1135578
+    observed_count: 1
+    signature:
+      object_type: pdf
+      typeOfResource: software, multimedia
+      has_parent: false
+      has_children: false
+      is_ordered: false
+      datastream_ids:
+      - DC
+      - MODS
+      - PDF
+      - RELS-EXT
+      - RELS-INT
+      - irMetadata
+      - rightsMetadata
+      - thumbnail
+      datastream_details:
+      - id: DC
+        mime_type: application/octet-stream
+      - id: MODS
+        mime_type: text/xml
+      - id: PDF
+        mime_type: application/pdf
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+      - id: thumbnail
+        mime_type: image/jpeg
+  zip_object_definition_0d30f5d8ec78:
+    signature_hash: 0d30f5d8ec78
+    label: zip object definition
+    description: Observed zip object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1144738
+    observed_count: 1
+    signature:
+      object_type: zip
+      typeOfResource: software
+      has_parent: false
+      has_children: false
+      is_ordered: false
+      datastream_ids:
+      - DC
+      - MODS
+      - RELS-EXT
+      - RELS-INT
+      - ZIP
+      - irMetadata
+      - rightsMetadata
+      datastream_details:
+      - id: DC
+        mime_type: application/octet-stream
+      - id: MODS
+        mime_type: text/xml
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: ZIP
+        mime_type: application/zip
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream
+  zip_object_definition_ec25c4a90c01:
+    signature_hash: ec25c4a90c01
+    label: zip object definition
+    description: Observed zip object definition through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1146780
+    observed_count: 1
+    signature:
+      object_type: zip
+      typeOfResource: still image
+      has_parent: false
+      has_children: false
+      is_ordered: false
+      datastream_ids:
+      - DC
+      - MODS
+      - RELS-EXT
+      - RELS-INT
+      - ZIP
+      - irMetadata
+      - rightsMetadata
+      datastream_details:
+      - id: DC
+        mime_type: application/octet-stream
+      - id: MODS
+        mime_type: text/xml
+      - id: RELS-EXT
+        mime_type: text/xml
+      - id: RELS-INT
+        mime_type: text/xml
+      - id: ZIP
+        mime_type: application/zip
+      - id: irMetadata
+        mime_type: application/octet-stream
+      - id: rightsMetadata
+        mime_type: application/octet-stream

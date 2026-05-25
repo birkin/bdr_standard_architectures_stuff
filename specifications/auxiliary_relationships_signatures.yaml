@@ -14,7 +14,7 @@ signatures:
     - bdr:1104403
     - bdr:1104404
     - bdr:1104406
-    observed_count: 13
+    observed_count: 100
     signature:
       has_derivations: false
       has_transcripts: false

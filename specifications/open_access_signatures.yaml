@@ -167,7 +167,7 @@ signatures:
     - bdr:788209
     - bdr:788210
     - bdr:788211
-    observed_count: 17
+    observed_count: 7
     signature:
       license:
       - This work is licensed under a Creative Commons Attribution 4.0 International
@@ -194,7 +194,7 @@ signatures:
     - bdr:841117
     - bdr:876446
     - bdr:876448
-    observed_count: 10
+    observed_count: 13
     signature:
       license:
       - This work is licensed under a Creative Commons Attribution-NonCommercial 4.0
@@ -226,6 +226,271 @@ signatures:
       license: unknown
       rights_statement: unknown
       restriction_statement: unknown
+      access_control:
+        public:
+        - 'True'
+        brown:
+        - 'False'
+        private:
+        - 'False'
+      current_embargo_status:
+        status: unknown
+        years: unknown
+        computed_current_status: unknown
+  open_access_evidence_8066ff4b9eda:
+    signature_hash: 8066ff4b9eda
+    label: open access evidence
+    description: Observed open access evidence through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1002868
+    - bdr:1002871
+    - bdr:1002872
+    observed_count: 44
+    signature:
+      license:
+      - This work is licensed under a Creative Commons Attribution-NonCommercial 4.0
+        International license
+      - https://creativecommons.org/licenses/by-nc/4.0/
+      rights_statement: unknown
+      restriction_statement: unknown
+      access_control:
+        public:
+        - 'True'
+        brown:
+        - 'True'
+        private:
+        - 'False'
+      current_embargo_status:
+        status: unknown
+        years: unknown
+        computed_current_status: unknown
+  open_access_evidence_00a4aac03709:
+    signature_hash: 00a4aac03709
+    label: open access evidence
+    description: Observed open access evidence through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1078411
+    - bdr:1078420
+    - bdr:1078471
+    observed_count: 4
+    signature:
+      license: unknown
+      rights_statement:
+      - No Copyright - United States
+      - https://rightsstatements.org/page/NoC-US/1.0/?language=en
+      restriction_statement:
+      - Collection is open for research.
+      access_control:
+        public:
+        - 'True'
+        brown:
+        - 'False'
+        private:
+        - 'False'
+      current_embargo_status:
+        status: unknown
+        years: unknown
+        computed_current_status: unknown
+  open_access_evidence_b91545ed340f:
+    signature_hash: b91545ed340f
+    label: open access evidence
+    description: Observed open access evidence through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1082415
+    observed_count: 1
+    signature:
+      license:
+      - This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike
+        4.0 International license
+      - https://creativecommons.org/licenses/by-nc-sa/4.0/
+      rights_statement: unknown
+      restriction_statement: unknown
+      access_control:
+        public:
+        - 'True'
+        brown:
+        - 'False'
+        private:
+        - 'False'
+      current_embargo_status:
+        status: unknown
+        years: unknown
+        computed_current_status: unknown
+  open_access_evidence_17a27c6502c8:
+    signature_hash: 17a27c6502c8
+    label: open access evidence
+    description: Observed open access evidence through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1102331
+    - bdr:1128451
+    - bdr:1133129
+    observed_count: 4
+    signature:
+      license:
+      - This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives
+        4.0 International License
+      - https://creativecommons.org/licenses/by-nc-nd/4.0/
+      rights_statement: unknown
+      restriction_statement: unknown
+      access_control:
+        public:
+        - 'True'
+        brown:
+        - 'False'
+        private:
+        - 'False'
+      current_embargo_status:
+        status: unknown
+        years: unknown
+        computed_current_status: unknown
+  open_access_evidence_6dcc9fdef493:
+    signature_hash: 6dcc9fdef493
+    label: open access evidence
+    description: Observed open access evidence through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1104317
+    - bdr:1104318
+    observed_count: 2
+    signature:
+      license:
+      - This work is licensed under a Creative Commons Attribution-NonCommercial 4.0
+        International License
+      - https://creativecommons.org/licenses/by-nc/4.0/
+      rights_statement: unknown
+      restriction_statement: unknown
+      access_control:
+        public:
+        - 'True'
+        brown:
+        - 'False'
+        private:
+        - 'False'
+      current_embargo_status:
+        status: unknown
+        years: unknown
+        computed_current_status: unknown
+  open_access_evidence_61d1d170acad:
+    signature_hash: 61d1d170acad
+    label: open access evidence
+    description: Observed open access evidence through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1127785
+    - bdr:1127786
+    - bdr:1127790
+    observed_count: 10
+    signature:
+      license:
+      - This work is licensed under a Creative Commons Attribution 4.0 International
+        license
+      - https://creativecommons.org/licenses/by/4.0/
+      rights_statement: unknown
+      restriction_statement: unknown
+      access_control:
+        public:
+        - 'True'
+        brown:
+        - 'False'
+        private:
+        - 'False'
+      current_embargo_status:
+        status: unknown
+        years: unknown
+        computed_current_status: unknown
+  open_access_evidence_c5a534984db5:
+    signature_hash: c5a534984db5
+    label: open access evidence
+    description: Observed open access evidence through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1127787
+    - bdr:1130994
+    - bdr:1131020
+    observed_count: 11
+    signature:
+      license:
+      - This work is licensed under a Creative Commons Attribution 4.0 International
+        license (CCBY)
+      - https://creativecommons.org/licenses/by/4.0/
+      rights_statement: unknown
+      restriction_statement: unknown
+      access_control:
+        public:
+        - 'True'
+        brown:
+        - 'False'
+        private:
+        - 'False'
+      current_embargo_status:
+        status: unknown
+        years: unknown
+        computed_current_status: unknown
+  open_access_evidence_1ea7e092b412:
+    signature_hash: 1ea7e092b412
+    label: open access evidence
+    description: Observed open access evidence through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1140620
+    observed_count: 1
+    signature:
+      license:
+      - Attribution 4.0 International (CC BY 4.0)
+      - https://creativecommons.org/licenses/by/4.0/legalcode
+      rights_statement:
+      - In Copyright
+      - http://rightsstatements.org/vocab/InC/1.0/
+      restriction_statement: unknown
+      access_control:
+        public:
+        - 'True'
+        brown:
+        - 'False'
+        private:
+        - 'False'
+      current_embargo_status:
+        status: unknown
+        years: unknown
+        computed_current_status: unknown
+  open_access_evidence_5980ed4e25b8:
+    signature_hash: 5980ed4e25b8
+    label: open access evidence
+    description: Observed open access evidence through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1144737
+    - bdr:1144738
+    observed_count: 2
+    signature:
+      license:
+      - This work is licensed under a GNU GPL3 License
+      - https://www.gnu.org/licenses/gpl.txt
+      rights_statement: unknown
+      restriction_statement: unknown
+      access_control:
+        public:
+        - 'True'
+        brown:
+        - 'False'
+        private:
+        - 'False'
+      current_embargo_status:
+        status: unknown
+        years: unknown
+        computed_current_status: unknown
+  open_access_evidence_c8aad4a9e46f:
+    signature_hash: c8aad4a9e46f
+    label: open access evidence
+    description: Observed open access evidence through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1146780
+    observed_count: 1
+    signature:
+      license:
+      - This work is licensed under a Creative Commons Attribution 4.0 International
+        License
+      - http://creativecommons.org/licenses/by/4.0/
+      rights_statement:
+      - In Copyright - United States
+      - http://rightsstatements.org/vocab/InC/1.0/
+      restriction_statement:
+      - Collection is open for research.
       access_control:
         public:
         - 'True'

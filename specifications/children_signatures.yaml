@@ -14,7 +14,7 @@ signatures:
     - bdr:1104403
     - bdr:1104404
     - bdr:1104406
-    observed_count: 99
+    observed_count: 96
     signature:
       object_definition_hashes: []
   1_child_object_definition_type_a23b9156d303:
@@ -35,7 +35,8 @@ signatures:
     exemplar_pids:
     - bdr:1102287
     - bdr:1148124
-    observed_count: 2
+    - bdr:1093305
+    observed_count: 1
     signature:
       object_definition_hashes:
       - 091cc58a6c3b
@@ -135,3 +136,26 @@ signatures:
       - 72e671a286f1
       - 9a15f14b2c5f
       - ef1791260418
+  3_child_object_definition_types_7ae06abd3d3f:
+    signature_hash: 7ae06abd3d3f
+    label: 3 child object definition types
+    description: Observed 3 child object definition types through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1054581
+    observed_count: 1
+    signature:
+      object_definition_hashes:
+      - 091cc58a6c3b
+      - 6e9712a017b5
+      - 75434c2a4827
+  1_child_object_definition_type_dcca8dbaac37:
+    signature_hash: dcca8dbaac37
+    label: 1 child object definition type
+    description: Observed 1 child object definition type through public BDR API sampling.
+    exemplar_pids:
+    - bdr:1067034
+    - bdr:1082415
+    observed_count: 2
+    signature:
+      object_definition_hashes:
+      - 75434c2a4827

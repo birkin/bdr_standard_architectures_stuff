@@ -14,7 +14,7 @@ signatures:
     - bdr:1104403
     - bdr:1104404
     - bdr:1104406
-    observed_count: 99
+    observed_count: 96
     signature:
       has_children: false
       ordered_children: false
@@ -26,7 +26,7 @@ signatures:
     - bdr:7dmq3aws
     - bdr:1102287
     - bdr:1148124
-    observed_count: 13
+    observed_count: 4
     signature:
       has_children: true
       ordered_children: true
