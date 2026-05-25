@@ -632,7 +632,7 @@ Why that is useful:
 - Fetching up to 1,000 children is useful for smaller targeted scans where child variation matters.
 - The flag name makes the safety ceiling explicit.
 
-MIME details are included in object-definition signatures by default only for non-standard datastreams. Standard metadata/repository datastreams `DC`, `MODS`, `RELS-EXT`, `RELS-INT`, `irMetadata`, `rightsMetadata`, and `thumbnail` still appear in `datastream_ids`, but their MIME types are excluded from signature identity as noise. There is no separate MIME flag.
+MIME details are included in object-definition signatures by default only for non-standard datastreams. Standard metadata/repository datastreams `DC`, `EXTRACTED_TEXT`, `MODS`, `RELS-EXT`, `RELS-INT`, `irMetadata`, `rightsMetadata`, and `thumbnail` still appear in `datastream_ids`, but their MIME types are excluded from signature identity as noise. There is no separate MIME flag.
 
 ### Collection Classification
 

@@ -490,3 +490,16 @@ Main response:
 Removed `observed_count` from generated specification YAML entries and from specification validation. Updated tests, README, the implementation plan example, and the object-definition TSV converter so TSV output no longer includes that column. Regenerated the sibling TSV file and verified with `uv run ./run_tests.py`, `uv run ruff check .`, and `uv run ./extras/convert_object_definition_signatures_to_tsv.py`.
 
 ---
+
+Prompt:
+
+- Add `EXTRACTED_TEXT` to the list of `STANDARD_DATASTREAM_IDS` in `bdr_standard_architectures/lib/signatures.py` -- that should be ignored for mime-type/signature calculation.
+- Update any documentation required.
+- Remove from `specifications/object_definition_signatures.yaml` those entries that include `EXTRACTED_TEXT` in their mime-types -- and note the signature of the removed file.
+	- Update any other signature files that may use that object-signature.
+
+Main response:
+
+Added `EXTRACTED_TEXT` to standard datastream MIME handling, updated README and tests, replaced the generated object-definition signatures `d9a0fc4ce6db` and `f1771ab8cd82` with `153ad4a40f79` and `06b6c7b9f1ef`, updated composite specification entries that referenced the old hashes, regenerated the object-definition TSV, and verified with tests, ruff, and a specification hash/reference validation check.
+
+---

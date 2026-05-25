@@ -10,6 +10,7 @@ log = logging.getLogger(__name__)
 
 STANDARD_DATASTREAM_IDS = {
     'DC',
+    'EXTRACTED_TEXT',
     'MODS',
     'RELS-EXT',
     'RELS-INT',

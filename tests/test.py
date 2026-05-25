@@ -122,6 +122,7 @@ class TestMain(unittest.TestCase):
             'datastreams_ssi': json.dumps(
                 {
                     'JP2': {'mimeType': 'image/jp2'},
+                    'EXTRACTED_TEXT': {'mimeType': 'text/plain'},
                     'MODS': {'mimeType': 'text/xml'},
                     'thumbnail': {'mimeType': 'image/jpeg'},
                 }
@@ -130,7 +131,7 @@ class TestMain(unittest.TestCase):
 
         datastreams = parse_datastreams(doc, include_mime_types=True)
 
-        self.assertEqual(('JP2:image/jp2', 'MODS', 'thumbnail'), datastreams)
+        self.assertEqual(('EXTRACTED_TEXT', 'JP2:image/jp2', 'MODS', 'thumbnail'), datastreams)
 
     def test_object_definition_signature_excludes_standard_datastream_mime_details(self) -> None:
         """
@@ -141,6 +142,7 @@ class TestMain(unittest.TestCase):
             'datastreams_ssi': json.dumps(
                 {
                     'JP2': {'mimeType': 'image/jp2'},
+                    'EXTRACTED_TEXT': {'mimeType': 'text/plain'},
                     'MODS': {'mimeType': 'text/xml'},
                     'thumbnail': {'mimeType': 'image/jpeg'},
                 }
@@ -149,7 +151,7 @@ class TestMain(unittest.TestCase):
 
         signature = build_object_definition_signature(doc, has_parent=False, has_children=False, is_ordered=False)
 
-        self.assertEqual(['JP2', 'MODS', 'thumbnail'], signature['datastream_ids'])
+        self.assertEqual(['EXTRACTED_TEXT', 'JP2', 'MODS', 'thumbnail'], signature['datastream_ids'])
         self.assertEqual([{'id': 'JP2', 'mime_type': 'image/jp2'}], signature['datastream_details'])
 
     def test_parse_datastreams_handles_invalid_json(self) -> None:
