@@ -13,6 +13,7 @@ from lib.models import ArchitectureIndex
 from lib.report import build_result
 from lib.sampling import fetch_children, fetch_sampled_top_level_items
 from lib.signatures import build_signature_bundle
+from lib.specifications import write_specification_files
 from lib.state import (
     collection_to_dict,
     ensure_checked_state,
@@ -108,6 +109,22 @@ def run_sampler_with_client(args: argparse.Namespace, client: ApiClient, state: 
         checked['collections'].append(collection.pid)
         state['in_progress'] = {'collection_pid': '', 'parent_pid': ''}
         save_state_if_enabled(args, state)
+        write_incremental_specifications(args, collection_summaries, architecture_index, collection_by_pid, state)
 
     result = build_result(args, collection_summaries, architecture_index, collection_by_pid, state)
     return result
+
+
+def write_incremental_specifications(
+    args: argparse.Namespace,
+    collection_summaries: list[dict[str, Any]],
+    architecture_index: ArchitectureIndex,
+    collection_by_pid: dict[str, Any],
+    state: dict[str, Any],
+) -> None:
+    """
+    Writes specification YAML files after each completed collection.
+    Called by: run_sampler_with_client()
+    """
+    result = build_result(args, collection_summaries, architecture_index, collection_by_pid, state)
+    write_specification_files(Path(args.output_specifications_dir), result)

@@ -370,3 +370,13 @@ Main response:
 Implemented the specific signature architecture. Added child sampling limits and `--fetch-all-children-max-1000`, removed `--include-mime-types`, added dimension/composite signature bundles, updated resumable state and reports, added YAML specification generation with merge behavior, added PyYAML, updated README and tests, and verified with `uv run ./run_tests.py`, `uv run ruff check .`, and `uv run ./main.py --help`.
 
 ---
+
+Prompt:
+
+update the code so that new specifications found are saved after each collection.
+
+Main response:
+
+Updated the sampler so specification YAML files are written after each completed collection, immediately after collection state is saved, while keeping the final specification write at the end of the run. Updated README documentation and verified with `uv run ./run_tests.py` and `uv run ruff check .`.
+
+---

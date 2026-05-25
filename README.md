@@ -327,13 +327,15 @@ What it does:
 
 - Sorts composite architecture candidates by dominance and sampled item count.
 - Applies report filters such as `--top-architectures` and `--include-singletons`.
-- Writes machine-readable JSON, human-readable Markdown, and specification YAML files.
+- Writes machine-readable JSON and human-readable Markdown at the end of the run.
+- Writes specification YAML files after each completed collection, then writes them again at the end as a final full flush.
 
 Why that is useful:
 
 - JSON supports downstream processing.
 - Markdown supports human review with BDR maintainers and ingest planners.
 - YAML specifications are the core reusable output for building up architecture knowledge over time.
+- Incremental YAML writes preserve newly discovered specifications even if a later collection or network request fails.
 
 ## Argument Reference
 
@@ -412,6 +414,7 @@ What it does:
 
 - Sets the directory where generated YAML specification files are written.
 - Existing compatible specification files are merged by deterministic signature hash.
+- Specification files are updated after each completed collection and again at the end of the run.
 
 Why that is useful:
 
