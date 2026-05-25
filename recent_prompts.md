@@ -553,3 +553,26 @@ Main response:
 Updated `extras/get_object_definition_signature.py` so missing specification comparison files return a structured non-match with `relative_path` and a clear message. Added test coverage, updated extras documentation, and verified with `uv run ./run_tests.py`, `uv run ruff check .`, and the script help command.
 
 ---
+
+Prompt:
+
+When `--compare-specifications` is used, the comparison section shows 'path' and 'relative_path' -- and they both show full paths.
+
+- remove `path`
+- update the code so `relative_path` shows only a relative path.
+
+Main response:
+
+Removed the absolute `path` field from single-item specification comparison output and changed `relative_path` generation to use a true relative path. Updated tests and verified with `uv run ./run_tests.py`, `uv run ruff check .`, and the script help command.
+
+---
+
+Prompt:
+
+in the json response, move the "title" to show after "pid" and before "signature_entry". thx.
+
+Main response:
+
+Updated the single-item signature script JSON formatting so output preserves insertion order instead of sorting keys, making `title` appear after `pid` and before `signature_entry`. Added test coverage and verified with `uv run ./run_tests.py`, `uv run ruff check .`, and the script help command.
+
+---

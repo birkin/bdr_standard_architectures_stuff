@@ -494,9 +494,12 @@ class TestMain(unittest.TestCase):
         result = module.build_result(args)
 
         self.assertTrue(fake_client.closed)
+        self.assertEqual(['api_root', 'pid', 'title', 'signature_entry'], list(result))
         self.assertEqual('bdr:item', result['pid'])
         self.assertEqual('object_definition', result['signature_entry']['signature_type'])
         self.assertNotIn('observed_count', result['signature_entry'])
+        formatted_result = module.format_result_json(result)
+        self.assertLess(formatted_result.find('"title"'), formatted_result.find('"signature_entry"'))
         self.assertEqual(['EXTRACTED_TEXT', 'PDF'], result['signature_entry']['signature']['datastream_ids'])
         self.assertEqual(
             [{'id': 'PDF', 'mime_type': 'application/pdf'}],
@@ -527,7 +530,9 @@ class TestMain(unittest.TestCase):
             match = module.find_specification_match(spec_dir, 'abc123')
 
         self.assertTrue(match['matched'])
-        self.assertEqual(str(spec_path), match['path'])
+        self.assertNotIn('path', match)
+        self.assertFalse(Path(match['relative_path']).is_absolute())
+        self.assertTrue(match['relative_path'].endswith('object_definition_signatures.yaml'))
         self.assertEqual('pdf_object_definition_abc123', match['entry_key'])
 
     def test_single_item_signature_handles_missing_specification_file(self) -> None:
@@ -541,7 +546,9 @@ class TestMain(unittest.TestCase):
             match = module.find_specification_match(spec_dir, 'abc123')
 
         self.assertFalse(match['matched'])
+        self.assertNotIn('path', match)
         self.assertIn('Comparison file could not be found at', match['message'])
+        self.assertFalse(Path(match['relative_path']).is_absolute())
         self.assertTrue(match['relative_path'].endswith('object_definition_signatures.yaml'))
 
 

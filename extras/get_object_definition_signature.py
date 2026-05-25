@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -22,7 +23,7 @@ from lib.config import (  # noqa: E402
     DEFAULT_USER_AGENT,
 )
 from lib.signatures import build_object_definition_signature, build_signature_entry  # noqa: E402
-from lib.utils import first_value, write_json  # noqa: E402
+from lib.utils import first_value  # noqa: E402
 
 
 OBJECT_DEFINITION_FIELDS = [
@@ -63,8 +64,8 @@ def main() -> None:
     args = parse_args()
     result = build_result(args)
     if args.output_json:
-        write_json(Path(args.output_json), result)
-    print(json.dumps(result, indent=2, sort_keys=True))
+        write_result_json(Path(args.output_json), result)
+    print(format_result_json(result))
 
 
 def build_result(args: argparse.Namespace) -> dict[str, Any]:
@@ -94,6 +95,24 @@ def build_result(args: argparse.Namespace) -> dict[str, Any]:
     if args.compare_specifications:
         result['specification_match'] = find_specification_match(Path(args.specifications_dir), entry['signature_hash'])
     return result
+
+
+def format_result_json(result: dict[str, Any]) -> str:
+    """
+    Formats output JSON while preserving result key order.
+    Called by: main()
+    """
+    text = json.dumps(result, indent=2)
+    return text
+
+
+def write_result_json(path: Path, result: dict[str, Any]) -> None:
+    """
+    Writes output JSON while preserving result key order.
+    Called by: main()
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(f'{format_result_json(result)}\n', encoding='utf-8')
 
 
 def build_client(args: argparse.Namespace) -> ApiClient:
@@ -160,7 +179,6 @@ def find_specification_match(specifications_dir: Path, signature_hash: str) -> d
     relative_path = relative_display_path(path)
     match = {
         'matched': False,
-        'path': str(path),
         'relative_path': relative_path,
         'message': '',
         'entry_key': '',
@@ -182,10 +200,7 @@ def relative_display_path(path: Path) -> str:
     Builds a readable path relative to the current working directory when possible.
     Called by: find_specification_match()
     """
-    try:
-        display_path = str(path.relative_to(Path.cwd()))
-    except ValueError:
-        display_path = str(path)
+    display_path = os.path.relpath(path, Path.cwd())
     return display_path
 
 
@@ -207,7 +222,6 @@ def find_signature_hash_match(signatures: dict[str, Any], signature_hash: str, p
     """
     match = {
         'matched': False,
-        'path': str(path),
         'relative_path': relative_display_path(path),
         'message': '',
         'entry_key': '',
@@ -218,7 +232,6 @@ def find_signature_hash_match(signatures: dict[str, Any], signature_hash: str, p
         if isinstance(entry, dict) and entry.get('signature_hash') == signature_hash:
             match = {
                 'matched': True,
-                'path': str(path),
                 'relative_path': relative_display_path(path),
                 'message': '',
                 'entry_key': entry_key,
