@@ -450,3 +450,13 @@ Main response:
 Updated MIME handling so standard datastream IDs remain in `datastream_ids` but their MIME types are excluded from object-definition signature identity. Bumped the signature architecture version, updated README documentation, added tests for standard datastream MIME exclusion, and verified with `uv run ./run_tests.py` and `uv run ruff check .`.
 
 ---
+
+Prompt:
+
+update the path to the "specifications" directory to be at a sibling level to the project-repo root (where the project-repo root means the directory that contains the .git directory)
+
+Main response:
+
+Updated `DEFAULT_SPECIFICATIONS_DIR` to point to the parent-level `../specifications` directory, updated the object-definition TSV converter input path, updated README and extras README documentation, added a test asserting the specifications path is outside the project root, and verified with `uv run ./run_tests.py`, `uv run ruff check .`, and `uv run ./main.py --help`.
+
+---

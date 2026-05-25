@@ -12,6 +12,7 @@ from lib.config import (
     DEFAULT_OUTPUT_MD,
     DEFAULT_OUTPUT_ROOT,
     DEFAULT_SLEEP_SECONDS,
+    DEFAULT_SPECIFICATIONS_DIR,
     DEFAULT_STATE_FILE,
     PROJECT_ROOT,
 )
@@ -93,6 +94,15 @@ class TestMain(unittest.TestCase):
         for default_path in default_paths:
             self.assertTrue(default_path.resolve().is_relative_to(DEFAULT_OUTPUT_ROOT.resolve()))
             self.assertFalse(default_path.resolve().is_relative_to(PROJECT_ROOT.resolve()))
+
+    def test_default_specifications_path_is_outside_project_root(self) -> None:
+        """
+        Checks that generated specification files live beside the project root.
+        """
+        default_path = Path(DEFAULT_SPECIFICATIONS_DIR)
+
+        self.assertTrue(default_path.resolve().is_relative_to(PROJECT_ROOT.parent.resolve()))
+        self.assertFalse(default_path.resolve().is_relative_to(PROJECT_ROOT.resolve()))
 
     def test_parse_datastreams_returns_sorted_ids(self) -> None:
         """

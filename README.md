@@ -51,7 +51,7 @@ The default run writes:
 
 - `../bdr_standard_architectures_output/common_architectures.json`
 - `../bdr_standard_architectures_output/common_architectures.md`
-- YAML specification files in `specifications/`
+- YAML specification files in `../specifications/`
 - `../bdr_standard_architectures_output/architecture_cache/run_state.json`
 - cached API responses in `../bdr_standard_architectures_output/architecture_cache/`
 
@@ -77,7 +77,7 @@ uv run ./main.py \
   --sleep-seconds 2.0 \
   --output-json ../bdr_standard_architectures_output/common_architectures.json \
   --output-md ../bdr_standard_architectures_output/common_architectures.md \
-  --output-specifications-dir specifications \
+  --output-specifications-dir ../specifications \
   --cache-dir ../bdr_standard_architectures_output/architecture_cache \
   --state-file ../bdr_standard_architectures_output/architecture_cache/run_state.json \
   --full-item-validation-sample 0 \
@@ -408,11 +408,12 @@ Why that is useful:
 
 #### `--output-specifications-dir`
 
-Default: `specifications`
+Default: `../specifications`
 
 What it does:
 
 - Sets the directory where generated YAML specification files are written.
+- The default path is a sibling of the project root, not inside the directory that contains `.git/`.
 - Existing compatible specification files are merged by deterministic signature hash.
 - Specification files are updated after each completed collection and again at the end of the run.
 

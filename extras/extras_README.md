@@ -14,7 +14,7 @@ uv run './extras/convert_object_definition_signatures_to_tsv.py'
 Input:
 
 ```text
-specifications/object_definition_signatures.yaml
+../specifications/object_definition_signatures.yaml
 ```
 
 Output:
@@ -25,4 +25,4 @@ Output:
 
 The TSV contains one row per object-definition signature entry. Columns include signature hash, label, description, observed count, exemplar PIDs, object type, `typeOfResource`, parent/child/order booleans, datastream IDs, datastream detail JSON, and full signature JSON.
 
-The `TSVs/` directory is a sibling of `bdr_standard_architectures/`, not inside the project package.
+The `specifications/` input directory and `TSVs/` output directory are siblings of `bdr_standard_architectures/`, not inside the project package.
