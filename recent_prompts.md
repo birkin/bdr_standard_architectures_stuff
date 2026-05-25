@@ -420,3 +420,33 @@ Main response:
 Updated `extras/convert_object_definition_signatures_to_tsv.py` to write to the parent-level `../TSVs/object_definition_signatures.tsv`, updated `extras/extras_README.md`, ran the converter successfully, and verified ruff passed.
 
 ---
+
+Prompt:
+
+Goal: Update the way mime-type check is handled.
+
+Context:
+
+- Too much of the mime-type info is just "noise".
+- There are a "default" or "standard" set of datastreams for which the mime-type is always the same, so I'd like to exclude those. These are:
+  - DC
+  - MODS
+  - RELS-EXT
+  - RELS-INT
+  - irMetadata
+  - rightsMetadata
+  - thumbnail
+
+Tasks:
+
+- Review `bdr_standard_architectures/AGENTS.md` for coding-directives.
+- Update the code so that mime-type handling does not include the default/standard data-streams in it's signature calculations.
+- Update any necessary documentation
+
+Thx.
+
+Main response:
+
+Updated MIME handling so standard datastream IDs remain in `datastream_ids` but their MIME types are excluded from object-definition signature identity. Bumped the signature architecture version, updated README documentation, added tests for standard datastream MIME exclusion, and verified with `uv run ./run_tests.py` and `uv run ruff check .`.
+
+---

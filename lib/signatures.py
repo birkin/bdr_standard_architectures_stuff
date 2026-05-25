@@ -8,6 +8,16 @@ from lib.utils import first_value
 
 log = logging.getLogger(__name__)
 
+STANDARD_DATASTREAM_IDS = {
+    'DC',
+    'MODS',
+    'RELS-EXT',
+    'RELS-INT',
+    'irMetadata',
+    'rightsMetadata',
+    'thumbnail',
+}
+
 
 def build_item_signature(
     parent_doc: dict[str, Any],
@@ -140,13 +150,14 @@ def build_object_definition_signature(
     Called by: build_signature_bundle()
     """
     datastream_details = parse_datastream_details(doc)
+    datastream_ids = parse_datastream_ids(doc)
     signature = {
         'object_type': first_value(doc.get('object_type')) or 'unknown',
         'typeOfResource': first_value(doc.get('mods_type_of_resource')) or 'unknown',
         'has_parent': has_parent,
         'has_children': has_children,
         'is_ordered': is_ordered,
-        'datastream_ids': [detail['id'] for detail in datastream_details],
+        'datastream_ids': datastream_ids,
         'datastream_details': datastream_details,
     }
     return signature
@@ -286,7 +297,7 @@ def parse_datastreams(doc: dict[str, Any], include_mime_types: bool = False) -> 
 
 def parse_datastream_details(doc: dict[str, Any]) -> list[dict[str, str]]:
     """
-    Parses datastream inventory into structured details.
+    Parses non-standard datastream inventory into structured details.
     Called by: build_object_definition_signature()
     """
     raw_value = doc.get('datastreams_ssi')
@@ -316,6 +327,22 @@ def parse_datastreams_json(raw_value: str) -> dict[str, Any] | None:
     return parsed_value
 
 
+def parse_datastream_ids(doc: dict[str, Any]) -> list[str]:
+    """
+    Parses datastream IDs from a Search API document.
+    Called by: build_object_definition_signature()
+    """
+    raw_value = doc.get('datastreams_ssi')
+    ids: list[str] = []
+    if raw_value:
+        parsed_value = parse_datastreams_json(first_value(raw_value))
+        if parsed_value is None:
+            ids = ['__INVALID_DATASTREAMS_JSON__']
+        else:
+            ids = sorted(str(datastream_id) for datastream_id in parsed_value)
+    return ids
+
+
 def normalize_datastreams(parsed_value: dict[str, Any], include_mime_types: bool) -> list[str]:
     """
     Normalizes parsed datastream JSON to stable tokens.
@@ -324,7 +351,7 @@ def normalize_datastreams(parsed_value: dict[str, Any], include_mime_types: bool
     datastreams = []
     for datastream_id, metadata in parsed_value.items():
         token = str(datastream_id)
-        if include_mime_types and isinstance(metadata, dict) and metadata.get('mimeType'):
+        if include_mime_types and should_include_mime_type(token) and isinstance(metadata, dict) and metadata.get('mimeType'):
             token = f'{token}:{metadata["mimeType"]}'
         datastreams.append(token)
     return datastreams
@@ -337,11 +364,23 @@ def normalize_datastream_details(parsed_value: dict[str, Any]) -> list[dict[str,
     """
     details = []
     for datastream_id, metadata in parsed_value.items():
+        datastream_id_string = str(datastream_id)
+        if not should_include_mime_type(datastream_id_string):
+            continue
         mime_type = 'unknown'
         if isinstance(metadata, dict) and metadata.get('mimeType'):
             mime_type = str(metadata['mimeType'])
-        details.append({'id': str(datastream_id), 'mime_type': mime_type})
+        details.append({'id': datastream_id_string, 'mime_type': mime_type})
     return details
+
+
+def should_include_mime_type(datastream_id: str) -> bool:
+    """
+    Returns whether MIME type should participate in signature identity.
+    Called by: normalize_datastream_details()
+    """
+    should_include = datastream_id not in STANDARD_DATASTREAM_IDS
+    return should_include
 
 
 def hash_signature(signature: dict[str, Any]) -> str:

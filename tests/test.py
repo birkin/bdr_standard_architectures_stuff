@@ -18,7 +18,13 @@ from lib.config import (
 from lib.models import ArchitectureIndex, CollectionRef
 from lib.report import render_markdown_report
 from lib.sampling import child_sort_key, fetch_children
-from lib.signatures import build_item_signature, build_signature_bundle, hash_signature, parse_datastreams
+from lib.signatures import (
+    build_item_signature,
+    build_object_definition_signature,
+    build_signature_bundle,
+    hash_signature,
+    parse_datastreams,
+)
 from lib.specifications import build_specification_documents, merge_signature_entry, validate_specification_document
 from lib.state import load_or_initialize_state, save_state_if_enabled
 from lib.utils import evenly_spaced_offsets, natural_sort_key
@@ -100,13 +106,41 @@ class TestMain(unittest.TestCase):
 
     def test_parse_datastreams_can_include_mime_type(self) -> None:
         """
-        Checks that MIME types can be included in datastream tokens.
+        Checks that MIME types are included only for non-standard datastream tokens.
         """
-        doc = {'datastreams_ssi': json.dumps({'JP2': {'mimeType': 'image/jp2'}, 'MODS': {}})}
+        doc = {
+            'datastreams_ssi': json.dumps(
+                {
+                    'JP2': {'mimeType': 'image/jp2'},
+                    'MODS': {'mimeType': 'text/xml'},
+                    'thumbnail': {'mimeType': 'image/jpeg'},
+                }
+            )
+        }
 
         datastreams = parse_datastreams(doc, include_mime_types=True)
 
-        self.assertEqual(('JP2:image/jp2', 'MODS'), datastreams)
+        self.assertEqual(('JP2:image/jp2', 'MODS', 'thumbnail'), datastreams)
+
+    def test_object_definition_signature_excludes_standard_datastream_mime_details(self) -> None:
+        """
+        Checks that standard datastream MIME types do not affect object-definition identity.
+        """
+        doc = {
+            'object_type': 'image',
+            'datastreams_ssi': json.dumps(
+                {
+                    'JP2': {'mimeType': 'image/jp2'},
+                    'MODS': {'mimeType': 'text/xml'},
+                    'thumbnail': {'mimeType': 'image/jpeg'},
+                }
+            ),
+        }
+
+        signature = build_object_definition_signature(doc, has_parent=False, has_children=False, is_ordered=False)
+
+        self.assertEqual(['JP2', 'MODS', 'thumbnail'], signature['datastream_ids'])
+        self.assertEqual([{'id': 'JP2', 'mime_type': 'image/jp2'}], signature['datastream_details'])
 
     def test_parse_datastreams_handles_invalid_json(self) -> None:
         """

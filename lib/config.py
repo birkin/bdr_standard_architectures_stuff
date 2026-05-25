@@ -3,8 +3,8 @@ import os
 from pathlib import Path
 
 
-SCRIPT_VERSION = '0.2'
-SIGNATURE_ARCHITECTURE_VERSION = 2
+SCRIPT_VERSION = '0.3'
+SIGNATURE_ARCHITECTURE_VERSION = 3
 DEFAULT_API_ROOT = 'https://repository.library.brown.edu/api/'
 DEFAULT_USER_AGENT = 'BDRArchitectureSampler/0.1 (Brown University Library internal planning)'
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
