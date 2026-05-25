@@ -1,4 +1,5 @@
 import argparse
+import importlib.util
 import json
 import tempfile
 import unittest
@@ -29,6 +30,20 @@ from lib.signatures import (
 from lib.specifications import build_specification_documents, merge_signature_entry, validate_specification_document
 from lib.state import load_or_initialize_state, save_state_if_enabled
 from lib.utils import evenly_spaced_offsets, natural_sort_key
+
+
+def load_extra_script(script_name: str) -> object:
+    """
+    Loads an extras script as a test module.
+    Called by: TestMain.test_single_item_signature_result_builds_object_definition_entry()
+    """
+    path = PROJECT_ROOT / 'extras' / script_name
+    spec = importlib.util.spec_from_file_location(script_name.removesuffix('.py'), path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f'Could not load {script_name}')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def build_args(**overrides: object) -> argparse.Namespace:
@@ -77,6 +92,20 @@ class FakeSearchClient:
         self.requests.append(params)
         page = self.pages[len(self.requests) - 1]
         return page
+
+
+class FakeSingleItemClient:
+    def __init__(self, doc: dict[str, object]) -> None:
+        self.doc = doc
+        self.requests: list[dict[str, object]] = []
+        self.closed = False
+
+    def search(self, params: dict[str, object]) -> dict[str, object]:
+        self.requests.append(params)
+        return {'response': {'docs': [self.doc]}}
+
+    def close(self) -> None:
+        self.closed = True
 
 
 class TestMain(unittest.TestCase):
@@ -432,6 +461,88 @@ class TestMain(unittest.TestCase):
         self.assertEqual('Reviewed label', merged['label'])
         self.assertEqual('Reviewed description', merged['description'])
         self.assertEqual(['bdr:old', 'bdr:new'], merged['exemplar_pids'])
+
+    def test_single_item_signature_result_builds_object_definition_entry(self) -> None:
+        """
+        Checks that the single-item helper builds an object-definition signature.
+        """
+        module = load_extra_script('get_object_definition_signature.py')
+        fake_client = FakeSingleItemClient(
+            {
+                'pid': 'bdr:item',
+                'primary_title': 'Example Item',
+                'object_type': 'pdf',
+                'mods_type_of_resource': 'text',
+                'datastreams_ssi': json.dumps(
+                    {
+                        'EXTRACTED_TEXT': {'mimeType': 'text/plain'},
+                        'PDF': {'mimeType': 'application/pdf'},
+                    }
+                ),
+                'rel_is_part_of_ssim': ['bdr:parent'],
+                'rel_has_part_ssim': [],
+            }
+        )
+        args = argparse.Namespace(
+            api_root='https://repository.library.brown.edu/api/',
+            pid='bdr:item',
+            specifications_dir=DEFAULT_SPECIFICATIONS_DIR,
+            compare_specifications=False,
+        )
+        module.build_client = lambda _args: fake_client
+
+        result = module.build_result(args)
+
+        self.assertTrue(fake_client.closed)
+        self.assertEqual('bdr:item', result['pid'])
+        self.assertEqual('object_definition', result['signature_entry']['signature_type'])
+        self.assertNotIn('observed_count', result['signature_entry'])
+        self.assertEqual(['EXTRACTED_TEXT', 'PDF'], result['signature_entry']['signature']['datastream_ids'])
+        self.assertEqual(
+            [{'id': 'PDF', 'mime_type': 'application/pdf'}],
+            result['signature_entry']['signature']['datastream_details'],
+        )
+
+    def test_single_item_signature_finds_specification_match(self) -> None:
+        """
+        Checks that the single-item helper can compare against object-definition specifications.
+        """
+        module = load_extra_script('get_object_definition_signature.py')
+        with tempfile.TemporaryDirectory() as temp_dir:
+            spec_dir = Path(temp_dir)
+            spec_path = spec_dir / 'object_definition_signatures.yaml'
+            spec_path.write_text(
+                '\n'.join(
+                    [
+                        'signatures:',
+                        '  pdf_object_definition_abc123:',
+                        '    signature_hash: abc123',
+                        '    label: pdf object definition',
+                        '    description: Reviewed PDF signature.',
+                    ]
+                ),
+                encoding='utf-8',
+            )
+
+            match = module.find_specification_match(spec_dir, 'abc123')
+
+        self.assertTrue(match['matched'])
+        self.assertEqual(str(spec_path), match['path'])
+        self.assertEqual('pdf_object_definition_abc123', match['entry_key'])
+
+    def test_single_item_signature_handles_missing_specification_file(self) -> None:
+        """
+        Checks that missing specification comparison files are reported clearly.
+        """
+        module = load_extra_script('get_object_definition_signature.py')
+        with tempfile.TemporaryDirectory() as temp_dir:
+            spec_dir = Path(temp_dir)
+
+            match = module.find_specification_match(spec_dir, 'abc123')
+
+        self.assertFalse(match['matched'])
+        self.assertIn('Comparison file could not be found at', match['message'])
+        self.assertTrue(match['relative_path'].endswith('object_definition_signatures.yaml'))
 
 
 if __name__ == '__main__':

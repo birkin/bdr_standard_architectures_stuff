@@ -503,3 +503,53 @@ Main response:
 Added `EXTRACTED_TEXT` to standard datastream MIME handling, updated README and tests, replaced the generated object-definition signatures `d9a0fc4ce6db` and `f1771ab8cd82` with `153ad4a40f79` and `06b6c7b9f1ef`, updated composite specification entries that referenced the old hashes, regenerated the object-definition TSV, and verified with tests, ruff, and a specification hash/reference validation check.
 
 ---
+
+Prompt:
+
+Goal: evaluate idea for additional feautre.
+
+Context: 
+
+- It'd be valuable to be able to run the code on an individual BDR-item to get it's object-definition-signature.
+- I'd rather not use the existing main script because it's really designed to gather data from a variety of items, via focusing on collection-processing.
+- I'm thinking of another script that'd go in `bdr_standard_architectures/extras/` -- that would ideally use existing functions.
+
+Task:
+
+- your thoughts?
+
+Main response:
+
+Recommended adding a small `extras/` script for single-item object-definition signature lookup, using existing API/client and signature functions rather than extending the collection-oriented main sampler. Suggested outputting both the object-definition signature and wrapper metadata/hash, optionally comparing the hash to existing specification YAML.
+
+---
+
+Prompt:
+
+how's your context-pressure?
+
+Main response:
+
+Reported that context pressure was okay after earlier compaction, with the current repo state and recent changes still clear.
+
+---
+
+Prompt:
+
+ok i like your ideas. plz review the agents.md file and implement via your suggested approach.
+
+Main response:
+
+Added `extras/get_object_definition_signature.py`, a read-only single-item object-definition signature lookup script that reuses the existing API client and signature helpers, optionally compares the generated hash against `../specifications/object_definition_signatures.yaml`, and can write JSON output. Updated extras documentation, added focused tests, and verified with the test suite, ruff, and the script help command.
+
+---
+
+Prompt:
+
+ensure that if `--compare-specifications` is used, and the target file does not exist, it is handled gracefully, with a message to the effect that the comparison file could not be found at the relative path x.
+
+Main response:
+
+Updated `extras/get_object_definition_signature.py` so missing specification comparison files return a structured non-match with `relative_path` and a clear message. Added test coverage, updated extras documentation, and verified with `uv run ./run_tests.py`, `uv run ruff check .`, and the script help command.
+
+---
