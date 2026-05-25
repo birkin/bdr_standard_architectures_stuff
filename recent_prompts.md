@@ -380,3 +380,33 @@ Main response:
 Updated the sampler so specification YAML files are written after each completed collection, immediately after collection state is saved, while keeping the final specification write at the end of the run. Updated README documentation and verified with `uv run ./run_tests.py` and `uv run ruff check .`.
 
 ---
+
+Prompt:
+
+create a script that will save each `bdr_standard_architectures/specifications/object_definition_signatures.yaml` entry to a TSV file, saved to `TSVs/object_definition_signatures.tsv`. Save the script to `bdr_standard_architectures/extras/convert_ object_definition_signatures_to_tsv.py`
+
+Main response:
+
+Added `extras/convert_ object_definition_signatures_to_tsv.py`, which reads `specifications/object_definition_signatures.yaml` and writes `TSVs/object_definition_signatures.tsv` with one row per signature entry. Ran the script successfully and verified it wrote 43 data rows. Ran `uv run ruff check './extras/convert_ object_definition_signatures_to_tsv.py'`.
+
+---
+
+Prompt:
+
+add an `bdr_standard_architectures/extras/extras_README.md` file with usage instructions.
+
+Main response:
+
+Added `extras/extras_README.md` with usage instructions for `convert_ object_definition_signatures_to_tsv.py`, including the command, input path, output path, and TSV column summary.
+
+---
+
+Prompt:
+
+create the TSVs folder in the project-repo _parent_ directory.
+
+Main response:
+
+Created `TSVs/` in the project repository parent directory.
+
+---
