@@ -576,3 +576,63 @@ Main response:
 Updated the single-item signature script JSON formatting so output preserves insertion order instead of sorting keys, making `title` appear after `pid` and before `signature_entry`. Added test coverage and verified with `uv run ./run_tests.py`, `uv run ruff check .`, and the script help command.
 
 ---
+
+Prompt:
+
+I just updated the `bdr_object_architectures/README.md` "Purpose". It's what I want the code to achieve.
+
+Review that section and the whole readme, and the codebase and sibling artifact directories, and list:
+- what the current-code _does_ do in support of that "Purpose" section.
+- what the current-code does _not_ yet do  support of that "Purpose" section.
+- what some next-steps might be.
+
+Main response:
+
+Reviewed against the updated Purpose in `README.md`.
+
+What it does:
+
+The code supports the core discovery/sampling loop: it discovers collections, samples top-level objects, fetches direct children, and builds signatures from Search API fields. The orchestration is in `lib/sampler.py`, with parent/child fetching in `lib/sampling.py`.
+
+It creates category signatures and an overall composite signature. Current categories are `parent_relationship`, `object_definition`, `children`, `open_access`, `visibility`, `auxiliary_relationships`, and `composite_architecture`. The composite signature is a hash of the component signature hashes.
+
+It accumulates reusable specification lists and writes them as YAML in the sibling `specifications/` repo. The current `../specifications` artifacts contain:
+
+```text
+object_definition: 34 signatures, all with exemplars
+open_access: 30 signatures, all with exemplars
+children: 5 signatures, all with exemplars
+parent_relationship: 2 signatures, all with exemplars
+visibility: 1 signature, with exemplar
+auxiliary_relationships: 1 signature, with exemplar
+composite_architecture: 65 signatures, 0 with exemplars
+```
+
+It maintains up to three exemplar PIDs for category specifications, preserves human-reviewed YAML fields like `label`, `description`, `narrative`, `status`, and `notes` during merges, and produces supporting JSON, Markdown, YAML, backup, and TSV artifacts.
+
+What it does not yet do:
+
+The biggest direct Purpose mismatch is that overall object/composite specifications do not get exemplar PIDs in the YAML, even though the Purpose says they should. Composite candidates store `example_items`, but specification output looks for `exemplar_pids`, so `composite_architecture_signatures.yaml` currently has empty exemplar lists.
+
+The `visibility` category is effectively a placeholder and always emits `public_api_observed`. Licensing/open-access support exists, but it is still shallow; `computed_current_status` is hardcoded to `unknown`.
+
+Relationship modeling is limited. Parent/child relationships are represented as `has_children` and `ordered_children`; auxiliary relationships only track derivation, transcript, translation, and annotation booleans. It does not yet model a fuller BDR relationship graph, collection membership semantics, descriptions, or recursive child/grandchild architectures.
+
+The `children` signature only records the set of unique child object-definition hashes. It does not yet encode child counts, required vs optional child types, order patterns, labels, or cardinality in the main `children` signature.
+
+The practical goals are not implemented yet as tools: there is no validator for user-supplied files/metadata, no ingester-output conformance checker, no migration/planning comparator from old architecture to target architecture, and no curated standard-supported-collection-architectures layer.
+
+Some CLI options are placeholders or only state parameters. `--include-private` and `--full-item-validation-sample` are parsed and recorded, but were only found used in state compatibility, not behavior.
+
+Next steps:
+
+1. Fix composite exemplars first. Add `exemplar_pids` to composite candidates from parent item PIDs, write them into `composite_architecture_signatures.yaml`, and add a regression test.
+2. Decide the real category taxonomy. The current names are reasonable, but `open_access` vs `visibility` needs a clearer boundary before these specs become validation contracts.
+3. Strengthen `children` signatures. Add child-definition cardinality/count buckets, ordering evidence, display labels, and truncation caveats where appropriate.
+4. Implement actual validation surfaces: start with "given a PID, compute signatures and compare to specs," then extend to "given ingest metadata/files, predict expected object-definition signature."
+5. Add a reviewed-standard layer separate from generated observations. Generated YAML can remain exhaustive; a curated file should mark which composite/category specs are supported, deprecated, candidate, or migration targets.
+6. Clean or regenerate stale merged spec entries. Current YAML is merged historical output, which is useful, but composite specs still carry older fields like `observed_count` on some entries and no exemplars. A deliberate normalization pass would make the artifacts more trustworthy.
+
+Baseline check: `uv run ./run_tests.py` passes, 22 tests.
+
+---
