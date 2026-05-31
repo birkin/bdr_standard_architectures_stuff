@@ -14,11 +14,27 @@
 
 ## Purpose
 
-This project identifies common object architectures in the Brown Digital Repository (BDR).
+This project identifies object architectures in the Brown Digital Repository (BDR).
 
-It samples BDR collections, looks at top-level objects and their direct children, normalizes each object's object type and datastream inventory, and groups repeated dimension signatures into composite architecture candidates.
+It samples specified BDR collections, looks at top-level objects and their direct children, and for each object:
+- assesses a variety of elements that define an object, including object-data, visibility, licensing, and relationship-to-other-objects
+- creates a "signature" for each category of specification, and an overall signature that represents all the aspects of the object-architecture.
 
-The practical goal is to support future ingest planning: when an architecture is common in the BDR, it is more likely to be a pattern the repository already supports without custom development.
+The code then adds these to lists of category-specifications and a list of overall object specifications.
+
+It also ensures that each category-specification includes up to three BDR pids that manifest that category-specification. Similarly each overall-object-specification includes up to three BDR pids that manifest that overall-object-specification. 
+
+The practical goals of specifiying object-architectures are multiple.
+
+Going forward:
+- user-supplied files and metadata can be better validated.
+- developer-designed ingester-code can be checked to ensure the output conforms to expectations.
+- this can help us plan "standard supported collection architectures", and communicate these to folk who want to ingest items into the BDR.
+- this can help us make requested improvements to the BDR without fear of altering parts of code that affect an object's representation in the BDR.
+
+Retrospectively:
+- --> If <-- at any point we want to bring an older collection into conformance with standard supported collection-specifications (normalizing metadata, for instance) -- we'd be able to very concretely see the specification of the older objects -- and better reason about how to migrate to a target specification.
+
 
 ## Usage
 
