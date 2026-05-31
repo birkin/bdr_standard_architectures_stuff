@@ -7,7 +7,7 @@ Small helper scripts for working with generated BDR architecture outputs.
 Script:
 
 ```bash
-cd bdr_standard_architectures
+cd bdr_object_architectures
 uv run './extras/convert_object_definition_signatures_to_tsv.py'
 ```
 
@@ -25,14 +25,14 @@ Output:
 
 The TSV contains one row per object-definition signature entry. Columns include signature hash, label, description, exemplar PIDs, object type, `typeOfResource`, parent/child/order booleans, datastream IDs, datastream detail JSON, and full signature JSON.
 
-The `specifications/` input directory and `TSVs/` output directory are siblings of `bdr_standard_architectures/`, not inside the project package.
+The `specifications/` input directory and `TSVs/` output directory are siblings of `bdr_object_architectures/`, not inside the project package.
 
 ## Get One Object-Definition Signature
 
 Script:
 
 ```bash
-cd bdr_standard_architectures
+cd bdr_object_architectures
 uv run './extras/get_object_definition_signature.py' bdr:123456
 ```
 

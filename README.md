@@ -1,4 +1,4 @@
-# bdr_standard_architectures
+# bdr_object_architectures
 
 ## Table Of Contents
 
@@ -49,11 +49,11 @@ uv run ./main.py
 
 The default run writes:
 
-- `../bdr_standard_architectures_output/common_architectures.json`
-- `../bdr_standard_architectures_output/common_architectures.md`
+- `../bdr_object_architectures_output/common_architectures.json`
+- `../bdr_object_architectures_output/common_architectures.md`
 - YAML specification files in `../specifications/`
-- `../bdr_standard_architectures_output/architecture_cache/run_state.json`
-- cached API responses in `../bdr_standard_architectures_output/architecture_cache/`
+- `../bdr_object_architectures_output/architecture_cache/run_state.json`
+- cached API responses in `../bdr_object_architectures_output/architecture_cache/`
 
 The defaults are resolved as paths in a sibling directory of this project root, not inside the directory that contains `.git/`.
 
@@ -75,11 +75,11 @@ uv run ./main.py \
   --max-children-per-parent 100 \
   --rows 100 \
   --sleep-seconds 2.0 \
-  --output-json ../bdr_standard_architectures_output/common_architectures.json \
-  --output-md ../bdr_standard_architectures_output/common_architectures.md \
+  --output-json ../bdr_object_architectures_output/common_architectures.json \
+  --output-md ../bdr_object_architectures_output/common_architectures.md \
   --output-specifications-dir ../specifications \
-  --cache-dir ../bdr_standard_architectures_output/architecture_cache \
-  --state-file ../bdr_standard_architectures_output/architecture_cache/run_state.json \
+  --cache-dir ../bdr_object_architectures_output/architecture_cache \
+  --state-file ../bdr_object_architectures_output/architecture_cache/run_state.json \
   --full-item-validation-sample 0 \
   --collection-query-mode public-top-level \
   --collection-pids "" \
@@ -113,8 +113,8 @@ Assumptions:
 ```bash
 mkdir -p ~/stuff
 cd ~/stuff
-git clone git@github.com:birkin/bdr_standard_architectures_stuff.git
-cd bdr_standard_architectures_stuff/bdr_standard_architectures
+git clone git@github.com:birkin/bdr_object_architectures_stuff.git
+cd bdr_object_architectures_stuff/bdr_object_architectures
 uv sync
 ```
 
@@ -141,9 +141,9 @@ To inspect 10 known additional collections separately, use explicit collection P
 ```bash
 uv run ./main.py \
   --collection-pids bdr:example1,bdr:example2,bdr:example3 \
-  --output-json ../bdr_standard_architectures_output/additional_architectures.json \
-  --output-md ../bdr_standard_architectures_output/additional_architectures.md \
-  --state-file ../bdr_standard_architectures_output/architecture_cache/additional_run_state.json
+  --output-json ../bdr_object_architectures_output/additional_architectures.json \
+  --output-md ../bdr_object_architectures_output/additional_architectures.md \
+  --state-file ../bdr_object_architectures_output/architecture_cache/additional_run_state.json
 ```
 
 That does not merge the new scan into the original report; it creates a separate targeted report.
@@ -385,7 +385,7 @@ Why that is useful:
 
 #### `--output-json`
 
-Default: `../bdr_standard_architectures_output/common_architectures.json`
+Default: `../bdr_object_architectures_output/common_architectures.json`
 
 What it does:
 
@@ -397,7 +397,7 @@ Why that is useful:
 
 #### `--output-md`
 
-Default: `../bdr_standard_architectures_output/common_architectures.md`
+Default: `../bdr_object_architectures_output/common_architectures.md`
 
 What it does:
 
@@ -427,7 +427,7 @@ Why that is useful:
 
 #### `--cache-dir`
 
-Default: `../bdr_standard_architectures_output/architecture_cache`
+Default: `../bdr_object_architectures_output/architecture_cache`
 
 What it does:
 
@@ -439,7 +439,7 @@ Why that is useful:
 
 #### `--state-file`
 
-Default: `../bdr_standard_architectures_output/architecture_cache/run_state.json`
+Default: `../bdr_object_architectures_output/architecture_cache/run_state.json`
 
 What it does:
 

@@ -4,7 +4,7 @@ _(in chronological order)_
 
 - Review `AGENTS.md` for coding-directives.
 
-- Review `bdr_standard_architectures/PLAN__determine_most_common_architectures.md`
+- Review `bdr_object_architectures/PLAN__determine_most_common_architectures.md`
 
 - You're already being nice to the server in the plan; thanks.
 
@@ -14,13 +14,13 @@ _(in chronological order)_
 
 	...so that if there's a network failure, the script can pick up where it left off
 	
-- Add these to the plan at `bdr_standard_architectures/PLAN__determine_most_common_architectures.md`
+- Add these to the plan at `bdr_object_architectures/PLAN__determine_most_common_architectures.md`
 
 ---
 
-Put most helper files in `bdr_standard_architectures/lib/` and import them as necessary.
+Put most helper files in `bdr_object_architectures/lib/` and import them as necessary.
 
-Keep only `main()` -- and the code it _directly_ calls in `bdr_standard_architectures/main.py`.
+Keep only `main()` -- and the code it _directly_ calls in `bdr_object_architectures/main.py`.
 
 ---
 
@@ -28,15 +28,15 @@ Goal: Document program flow and arguments.
 
 Context:
 
-- There are a large number of possible arguments that can be sent to `bdr_standard_architectures/main.py` main().
+- There are a large number of possible arguments that can be sent to `bdr_object_architectures/main.py` main().
 
 - That can be overwhelming if not understood.
 
 Tasks:
 
-- Review the `bdr_standard_architectures/` code.
+- Review the `bdr_object_architectures/` code.
 
-- Update `bdr_standard_architectures/README.md` to document:
+- Update `bdr_object_architectures/README.md` to document:
 	-  the flow of code
 	-  the purpose of each argument
 	-  this readme documentation should include both the concept of "what it does" and "why that's useful".
@@ -47,13 +47,13 @@ Tasks:
 
   I'm thinking that for some of these arguments, there is a default. If so, indicate in the appropriate argument section what the default is, if it's not already there.
 
-  Add this prompt to `bdr_standard_architectures/recent_prompts.md`.
+  Add this prompt to `bdr_object_architectures/recent_prompts.md`.
 
 ---
 
 - Ensure all default output paths are _not_ in the project-root (where the .git/ directory lives). Set all default output paths to the sibling directory of the project-root.
 
-  Add this prompt to `bdr_standard_architectures/recent_prompts.md`.
+  Add this prompt to `bdr_object_architectures/recent_prompts.md`.
 
 ---
 
@@ -63,7 +63,7 @@ questions:
 
 - if I run the script in the most minimal way, and it goes through X collections (I think the default is 20, yes?). If I then want to check an _additional_, say, 10 collections, what would the follow up command be -- _if_ it's even possible to "build on" previous work. (If it's not, that's ok -- I'm not asking you to add that functionality if it's not there.)
 
-- Add this prompt to `bdr_standard_architectures/recent_prompts.md`.
+- Add this prompt to `bdr_object_architectures/recent_prompts.md`.
 
 ---
 
@@ -79,7 +79,7 @@ Have it include:
 
 (I may have left stuff out)
 
-- Add this prompt to `bdr_standard_architectures/recent_prompts.md`.
+- Add this prompt to `bdr_object_architectures/recent_prompts.md`.
 
 ---
 
@@ -89,7 +89,7 @@ Context:
 
 - Since the goal of this is to gather data to establish common object-architectures. I had thought the "signature" was a unique identifier for a unique object-architecture.
 
-- However, review `bdr_standard_architectures/Understand_Project_and_`children_truncated`.md`
+- However, review `bdr_object_architectures/Understand_Project_and_`children_truncated`.md`
 
 Goal: 
 
@@ -97,9 +97,9 @@ Goal:
 
 - it's ok if it's an additional signature, as long as the names are clear.
 
-- Add your thoughts for a possible update to an addendum to `bdr_standard_architectures/PLAN__determine_most_common_architectures.md`
+- Add your thoughts for a possible update to an addendum to `bdr_object_architectures/PLAN__determine_most_common_architectures.md`
 
-- Add this prompt to `bdr_standard_architectures/recent_prompts.md`.
+- Add this prompt to `bdr_object_architectures/recent_prompts.md`.
 
 ---
 
@@ -130,28 +130,28 @@ Tasks:
 
 - Do not think about coding implementation yet -- let's explore the ideas.
 
-- Save the plan to `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md`
+- Save the plan to `bdr_object_architectures/plans/PLAN__consider_specific_signatures.md`
 
 Main response:
 
-- Created `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md`.
+- Created `bdr_object_architectures/plans/PLAN__consider_specific_signatures.md`.
 - Proposed a dimension-signature model separating parent relationship, object datastream, child profile, future visibility, presentation/navigation, and auxiliary relationship signatures.
 - Included two YAML organization proposals: a single registry file and multiple flat files in `specifications/`.
 - Recommended starting with multiple flat YAML files if the project is moving toward reusable specifications, while noting that a single registry file may be better for short-lived brainstorming.
 
 ---
 
-Goal: Refine `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md` plan.
+Goal: Refine `bdr_object_architectures/plans/PLAN__consider_specific_signatures.md` plan.
 
 Context:
 
-- Review `bdr_standard_architectures/README.md` to understand the purpose of the project. Ignore the current specific implementation.
+- Review `bdr_object_architectures/README.md` to understand the purpose of the project. Ignore the current specific implementation.
 - Incorporate follow-up decisions about parent relationship signatures, object datastream signatures, open-access signatures, visibility signatures, auxiliary relationship signatures, future video-streaming questions, and future allowed-values YAML files.
 - Incorporate direct `FEEDBACK` entries from the plan and remove those raw feedback entries from the final document.
 
 Main response:
 
-- Updated `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md`.
+- Updated `bdr_object_architectures/plans/PLAN__consider_specific_signatures.md`.
 - Added README-derived project context emphasizing observed BDR behavior and ingest-planning usefulness.
 - Clarified initial fields for `parent_relationship_signatures.yaml` and `object_datastream_signatures.yaml`.
 - Added `open_access_signatures.yaml` and `auxiliary_relationships_signatures.yaml` to the plan and YAML examples.
@@ -169,7 +169,7 @@ Please remove those two options and their strenghts and weaknesses -- since this
 
 Main response:
 
-- Updated `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md` to remove the proposal comparison.
+- Updated `bdr_object_architectures/plans/PLAN__consider_specific_signatures.md` to remove the proposal comparison.
 - Replaced the proposal sections with a single decided `Specification File Structure` section.
 - Removed strengths, weaknesses, recommendation, and remaining Proposal 1 / Proposal 2 language.
 - Updated the proposed next step to refer only to multiple flat YAML files.
@@ -184,7 +184,7 @@ Plan feedback:
 
 Main response:
 
-- Updated `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md`.
+- Updated `bdr_object_architectures/plans/PLAN__consider_specific_signatures.md`.
 - Removed `parent_object_type` from the parent relationship signature section.
 - Renamed the object datastream signature concept/file to `object_definition_signatures.yaml`.
 - Added `typeOfResource` as an object definition field when available.
@@ -199,7 +199,7 @@ Plan feedback:
 
 Main response:
 
-- Updated `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md`.
+- Updated `bdr_object_architectures/plans/PLAN__consider_specific_signatures.md`.
 - Removed the `Child Profile Signature` section.
 - Removed `child_profile_signatures.yaml` from the specification file list.
 - Removed child-profile references from YAML examples, composite signatures, initial signature lists, and answered questions.
@@ -216,7 +216,7 @@ Plan feedback:
 
 Main response:
 
-- Updated `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md`.
+- Updated `bdr_object_architectures/plans/PLAN__consider_specific_signatures.md`.
 - Added `has_parent`, `has_children`, and `is_ordered` to Object Definition Signature.
 - Updated object-definition YAML examples with the new fields.
 - Removed the Presentation Or Navigation Signature section.
@@ -240,7 +240,7 @@ Plan feedback:
 
 Main response:
 
-- Updated `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md`.
+- Updated `bdr_object_architectures/plans/PLAN__consider_specific_signatures.md`.
 - Added YAML examples for all six decided specification files.
 - Added `signature_hash` placeholders to individual and composite signature examples.
 - Added `exemplar_pids` placeholders with three BDR PID slots per signature.
@@ -255,7 +255,7 @@ Plan feedback:
 
 Main response:
 
-- Updated `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md`.
+- Updated `bdr_object_architectures/plans/PLAN__consider_specific_signatures.md`.
 - Moved human-readable component labels in the composite YAML example into `component_labels`.
 - Left only component `signature_hash` values inside the composite `signature` block.
 - Clarified that `description`, `narrative`, `component_labels`, and `exemplar_pids` support review but should not normally affect the composite hash.
@@ -266,19 +266,19 @@ Goal: Develop a thorough implementation plan.
 
 Context:
 
-- Removed next-steps sections from `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md`.
+- Removed next-steps sections from `bdr_object_architectures/plans/PLAN__consider_specific_signatures.md`.
 - Review `README.md`, `PLAN__consider_specific_signatures.md`, and `AGENTS.md`.
 - Preserve as much existing flag behavior and API response caching as reasonably possible.
 - Focus new work on capturing and building out signatures.
 - Keep default sampling of 100 parent items per collection.
 - Add default examination of 100 child objects per parent item.
 - Default to one request every 2 seconds due to increased child-object inspection.
-- Save the implementation plan to `bdr_standard_architectures/plans/PLAN__implement_specific_signatures.md`.
+- Save the implementation plan to `bdr_object_architectures/plans/PLAN__implement_specific_signatures.md`.
 - Do not change code yet.
 
 Main response:
 
-- Created `bdr_standard_architectures/plans/PLAN__implement_specific_signatures.md`.
+- Created `bdr_object_architectures/plans/PLAN__implement_specific_signatures.md`.
 - Included current project context, implementation architecture, target signature model, child-object sampling changes, API/load concerns, state/cache compatibility, module-by-module changes, testing plan, smoke commands, risks, and open implementation decisions.
 - Did not change runtime code.
 
@@ -293,10 +293,10 @@ Goal: Develop a thorough implementation plan.
 
 Context:
 
-- I removed the next-steps sections from the `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md` -- there will be a new plan for implementation.
-- Review `bdr_standard_architectures/README.md` to get an idea of the overall goal of this project -- and of the _current_ soon-to-be-changed implementation.
-- Review the `bdr_standard_architectures/plans/PLAN__consider_specific_signatures.md` -- this will be the basis for the new plan.
-- Review `bdr_standard_architectures/AGENTS.md` for coding-directives.
+- I removed the next-steps sections from the `bdr_object_architectures/plans/PLAN__consider_specific_signatures.md` -- there will be a new plan for implementation.
+- Review `bdr_object_architectures/README.md` to get an idea of the overall goal of this project -- and of the _current_ soon-to-be-changed implementation.
+- Review the `bdr_object_architectures/plans/PLAN__consider_specific_signatures.md` -- this will be the basis for the new plan.
+- Review `bdr_object_architectures/AGENTS.md` for coding-directives.
 - I really like the multiple flags and the caching of api responses in the current code implementation. Leave as much of the existing functionality in-place as reasonably possible.
 - The focus of the new work is on capturing and building out signatures.
 - Keep the idea that for a given collection -- default to examining 100 parent-items.
@@ -307,11 +307,11 @@ Tasks:
 - Create an implementation plan to update the code to implement the new specification architecture.
 - Due to examining more child-objects, there may be more server load, so default to one request every 2 seconds.
 - Add to the plan any contextual info that might be useful if the plan were to be implemented in a new session.
-- Save the new plan to `bdr_standard_architectures/plans/PLAN__implement_specific_signatures.md`.
+- Save the new plan to `bdr_object_architectures/plans/PLAN__implement_specific_signatures.md`.
 - Don't change any code yet -- this is plan-work.
 [--- END ---]
 
-...And here is the resulting plan: `bdr_standard_architectures/plans/PLAN__implement_specific_signatures.md`.
+...And here is the resulting plan: `bdr_object_architectures/plans/PLAN__implement_specific_signatures.md`.
 
 Please review the prompt, and the plan, and make any edits to the plan that would be useful for you to implement. Also feel free to add a section to the plan of Questions/Decision-points for me to answer.
 
@@ -323,11 +323,11 @@ Reviewed the source prompt, existing implementation plan, `PLAN__consider_specif
 
 Prompt:
 
-add table-of-contents/index links near the top of `bdr_standard_architectures/plans/PLAN__implement_specific_signatures.md` for top-level headings only.
+add table-of-contents/index links near the top of `bdr_object_architectures/plans/PLAN__implement_specific_signatures.md` for top-level headings only.
 
 Main response:
 
-Added a top-level-only table of contents near the top of `bdr_standard_architectures/plans/PLAN__implement_specific_signatures.md`.
+Added a top-level-only table of contents near the top of `bdr_object_architectures/plans/PLAN__implement_specific_signatures.md`.
 
 ---
 
@@ -339,7 +339,7 @@ Update the plan accordingly, and do feel free to keep a section for new question
 
 Main response:
 
-Updated `bdr_standard_architectures/plans/PLAN__implement_specific_signatures.md` to incorporate the marked feedback and recent direct plan changes. Added `children_signatures.yaml`, made specification YAML generation a core normal output, added the 1,000-child safety cap for `--fetch-all-children`, resolved known Solr/API field names, made MIME details part of object-definition identity by default, removed stale opt-in/feedback question language, and kept a short open-decisions section for implementation-time choices.
+Updated `bdr_object_architectures/plans/PLAN__implement_specific_signatures.md` to incorporate the marked feedback and recent direct plan changes. Added `children_signatures.yaml`, made specification YAML generation a core normal output, added the 1,000-child safety cap for `--fetch-all-children`, resolved known Solr/API field names, made MIME details part of object-definition identity by default, removed stale opt-in/feedback question language, and kept a short open-decisions section for implementation-time choices.
 
 ---
 
@@ -351,15 +351,15 @@ Prompt:
 
 Main response:
 
-Updated `bdr_standard_architectures/plans/PLAN__implement_specific_signatures.md` to incorporate the marked feedback. Renamed the child-fetch flag to `--fetch-all-children-max-1000`, removed the planned `--include-mime-types` flag, reframed field access as BDR API / BDR Search API access, required structural validation tests for generated YAML if no schema validator is used, and clarified YAML merge preservation for label-like human-entered fields.
+Updated `bdr_object_architectures/plans/PLAN__implement_specific_signatures.md` to incorporate the marked feedback. Renamed the child-fetch flag to `--fetch-all-children-max-1000`, removed the planned `--include-mime-types` flag, reframed field access as BDR API / BDR Search API access, required structural validation tests for generated YAML if no schema validator is used, and clarified YAML merge preservation for label-like human-entered fields.
 
 ---
 
 Prompt:
 
-- Review `bdr_standard_architectures/AGENTS.md` for coding-directives.
+- Review `bdr_object_architectures/AGENTS.md` for coding-directives.
 
-- Review `bdr_standard_architectures/plans/PLAN__implement_specific_signatures.md` for the plan to implement.
+- Review `bdr_object_architectures/plans/PLAN__implement_specific_signatures.md` for the plan to implement.
 
 - Proceed with implementation!
 
@@ -383,7 +383,7 @@ Updated the sampler so specification YAML files are written after each completed
 
 Prompt:
 
-create a script that will save each `bdr_standard_architectures/specifications/object_definition_signatures.yaml` entry to a TSV file, saved to `TSVs/object_definition_signatures.tsv`. Save the script to `bdr_standard_architectures/extras/convert_ object_definition_signatures_to_tsv.py`
+create a script that will save each `bdr_object_architectures/specifications/object_definition_signatures.yaml` entry to a TSV file, saved to `TSVs/object_definition_signatures.tsv`. Save the script to `bdr_object_architectures/extras/convert_ object_definition_signatures_to_tsv.py`
 
 Main response:
 
@@ -393,7 +393,7 @@ Added `extras/convert_ object_definition_signatures_to_tsv.py`, which reads `spe
 
 Prompt:
 
-add an `bdr_standard_architectures/extras/extras_README.md` file with usage instructions.
+add an `bdr_object_architectures/extras/extras_README.md` file with usage instructions.
 
 Main response:
 
@@ -413,7 +413,7 @@ Created `TSVs/` in the project repository parent directory.
 
 Prompt:
 
-update the script to save the TSV files to a TSV directory sibling to (not inside) of `bdr_standard_architectures`.
+update the script to save the TSV files to a TSV directory sibling to (not inside) of `bdr_object_architectures`.
 
 Main response:
 
@@ -439,7 +439,7 @@ Context:
 
 Tasks:
 
-- Review `bdr_standard_architectures/AGENTS.md` for coding-directives.
+- Review `bdr_object_architectures/AGENTS.md` for coding-directives.
 - Update the code so that mime-type handling does not include the default/standard data-streams in it's signature calculations.
 - Update any necessary documentation
 
@@ -493,7 +493,7 @@ Removed `observed_count` from generated specification YAML entries and from spec
 
 Prompt:
 
-- Add `EXTRACTED_TEXT` to the list of `STANDARD_DATASTREAM_IDS` in `bdr_standard_architectures/lib/signatures.py` -- that should be ignored for mime-type/signature calculation.
+- Add `EXTRACTED_TEXT` to the list of `STANDARD_DATASTREAM_IDS` in `bdr_object_architectures/lib/signatures.py` -- that should be ignored for mime-type/signature calculation.
 - Update any documentation required.
 - Remove from `specifications/object_definition_signatures.yaml` those entries that include `EXTRACTED_TEXT` in their mime-types -- and note the signature of the removed file.
 	- Update any other signature files that may use that object-signature.
@@ -512,7 +512,7 @@ Context:
 
 - It'd be valuable to be able to run the code on an individual BDR-item to get it's object-definition-signature.
 - I'd rather not use the existing main script because it's really designed to gather data from a variety of items, via focusing on collection-processing.
-- I'm thinking of another script that'd go in `bdr_standard_architectures/extras/` -- that would ideally use existing functions.
+- I'm thinking of another script that'd go in `bdr_object_architectures/extras/` -- that would ideally use existing functions.
 
 Task:
 
